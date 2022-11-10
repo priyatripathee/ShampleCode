@@ -1,0 +1,113 @@
+<?xml version="1.0" standalone="yes"?>
+<SiteSettings>
+	<Setting>
+		<key>HomeImgPath</key>
+		<value>../images/Home/</value>
+	</Setting>
+  <Setting>
+    <key>GalleryImgPath</key>
+    <value>../assets/img/Images/</value>
+  </Setting>
+  <Setting>
+    <key>ThmbImgPath</key>
+    <value>../images/uploads_Images/Thumb/</value>
+  </Setting>
+  <Setting>
+    <key>ThmbImgWidth</key>
+    <value>200</value>
+  </Setting>
+  <Setting>
+    <key>ThmbImgHeight</key>
+    <value>100</value>
+  </Setting>
+
+
+	<Setting>
+		<key>LrgImgPath</key>
+		<value>../images/uploads_Images/Larges/</value>
+	</Setting>
+	<Setting>
+		<key>LrgImgWidth</key>
+		<value>500</value>
+	</Setting>
+	<Setting>
+		<key>LrgImgHeight</key>
+		<value>600</value>
+	</Setting>
+
+
+	<Setting>
+		<key>LrgImgPath_BulletinBoard</key>
+		<value>~/images/Bulletin_Board/Larges/</value>
+	</Setting>
+	<Setting>
+		<key>ThumbImgPath_BulletinBoard</key>
+		<value>~/images/Bulletin_Board/Thumb/</value>
+	</Setting>
+	<Setting>
+		<key>ThumbImgPath_BulletinBoard_Width</key>
+		<value>480</value>
+	</Setting>
+	<Setting>
+		<key>ThumbImgPath_BulletinBoard_Height</key>
+		<value>300</value>
+	</Setting>
+	
+	
+
+	<Setting>
+		<key>LrgImgPath_Career</key>
+		<value>~/images/Career/Larges/</value>
+	</Setting>
+	<Setting>
+		<key>ThumbImgPath_Career</key>
+		<value>~/images/Career/Thumb/</value>
+	</Setting>
+	<Setting>
+		<key>ThumbImgPath_Career_Width</key>
+		<value>480</value>
+	</Setting>
+	<Setting>
+		<key>ThumbImgPath_Career_Height</key>
+		<value>300</value>
+	</Setting>
+
+
+
+	<Setting>
+		<key>LrgImgPath_Content</key>
+		<value>~/images/Content/Larges/</value>
+	</Setting>
+	<Setting>
+		<key>ThumbImgPath_Content</key>
+		<value>~/images/Content/Thumb/</value>
+	</Setting>
+	<Setting>
+		<key>ThumbImgPath_Content_Width</key>
+		<value>480</value>
+	</Setting>
+	<Setting>
+		<key>ThumbImgPath_Content_Height</key>
+		<value>300</value>
+	</Setting>
+
+
+  <Setting>
+    <key>LrgImgPath_Parent_Speak</key>
+    <value>~/images/Parent_Speak/Larges/</value>
+  </Setting>
+  <Setting>
+    <key>ThumbImgPath_Parent_Speak</key>
+    <value>~/images/Parent_Speak/Thumb/</value>
+  </Setting>
+
+
+  <Setting>
+    <key>LrgImgPath_Gallery</key>
+    <value>~/images/Gallery/Larges/</value>
+  </Setting>
+  <Setting>
+    <key>ThumbImgPath_Gallery</key>
+    <value>~/images/Gallery/Thumb/</value>
+  </Setting>
+</SiteSettings>

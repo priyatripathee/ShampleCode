@@ -1,0 +1,20 @@
+<?xml version="1.0" standalone="yes"?>
+<SiteUrl>
+  <Table1>
+    <key>Home</key>
+    <url>http://www.pantel.com/</url>
+    <flag>1</flag>
+  </Table1>
+  <Table1>
+    <key>contac4tus</key>
+    <url>contac4tus.aspx</url>
+  </Table1>
+  <Table1>
+    <key>Home1</key>
+    <url>home1.aspx</url>
+  </Table1>
+  <Table1>
+    <key>5</key>
+    <url>5</url>
+  </Table1>
+</SiteUrl>

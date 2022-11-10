@@ -1,0 +1,72 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using DAL;
+using System.Data;
+
+namespace BLL
+{
+    public class order_handler
+    {
+        private order_data objOrderData { get; set; }
+
+        public order_handler()
+        {
+            objOrderData = new order_data();
+        }
+
+        public long insert_order(BusinessEntities.order _order)
+        {
+            return objOrderData.insert_order(_order);
+        }
+        public bool insert_order_detail(BusinessEntities.order _orderDetails)
+        {
+            return objOrderData.insert_order_detail(_orderDetails);
+        }
+        public bool update_product_quantity(BusinessEntities.order _orderDetails)
+        {
+            return objOrderData.update_product_quantity(_orderDetails);
+        }
+        public DataSet get_order_status(Guid customer_id, int flag)
+        {
+            return objOrderData.get_order_status(customer_id, flag);
+        }
+        public DataSet get_order_return(string email_id, int flag)
+        {
+            return objOrderData.get_order_return(email_id, flag);
+        }
+        public DataSet get_order_search(Int64 order_id)
+        {
+            return objOrderData.get_order_search(order_id);
+        }
+        public DataSet get_order_search(Int64 order_id)
+        {
+            return objOrderData.get_order_search(order_id);
+        }
+        public bool pr_delete_order(Int32 order_id)
+        {
+            return objOrderData.delete_order(order_id);
+        }
+        public bool update_order_status(BusinessEntities.order orderDetails)
+        {
+            return objOrderData.update_order_status(orderDetails);
+        }
+        public DataSet get_order_status_track(Int64 order_detail_id, int flag)
+        {
+            return objOrderData.get_order_status_track(order_detail_id, flag);
+        }
+        public bool update_cancel_product(BusinessEntities.order orderDetails)
+        {
+            return objOrderData.update_cancel_product(orderDetails);
+        }
+        public bool insert_raise_complain(BusinessEntities.order orderDetails)
+        {
+            return objOrderData.insert_raise_complain(orderDetails);
+        }
+        public bool insert_LeaveFeedback(BusinessEntities.order orderDetails)
+        {
+            return objOrderData.insert_LeaveFeedback(orderDetails);
+        }
+    }
+}

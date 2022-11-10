@@ -1,0 +1,1819 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Configuration;
+using System.Text;
+using System.Security.Cryptography;
+using BLL;
+using BusinessEntities;
+using System.Data;
+using System.Net;
+using System.IO;
+using System.Web.Mail;
+using System.Collections.Specialized;
+using CCA.Util;
+using Razorpay.Api;
+
+namespace strutt
+{
+    public partial class proceedtopayment : System.Web.UI.Page
+    {
+        string msgbody = "";
+        string thumbimg = "";
+        long proid = 0;
+        int qty = 0;
+        int txtqty = 1;
+        int qtycount = 0;
+        //string ordPrifix = "STR";
+
+        #region page load
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            DataTable dtCart = (DataTable)Session["Cart"];
+            if (dtCart == null || dtCart.Rows.Count == 0)
+                Response.Redirect("~/");
+
+            if (!IsPostBack)
+            {
+                headReceiverAddress.Visible = false;
+
+                if (Session["CustomerData"] == null)
+                {
+                    DataTable dtCustomerData = new DataTable("CustomerData");
+                    dtCustomerData.Columns.Add("customer_id", typeof(Guid));
+                    dtCustomerData.Columns.Add("full_name", typeof(string));
+                    dtCustomerData.Columns.Add("Email", typeof(string));
+                    dtCustomerData.Columns.Add("contact_number", typeof(string));
+
+                    Session["CustomerData"] = dtCustomerData;
+                }
+                this.bindState();
+                if (Session["CustomerLoginDetails"] != null)
+                {
+                    if (Convert.ToString(Session["loginType"]) == "register" || Convert.ToString(Session["loginType"]) == "fb" || Convert.ToString(Session["loginType"]) == "google")
+                    {
+                        txtguestemail.Text = Session["CustomerLoginDetails"].ToString();
+                        bindDeliveryDetails(Session["CustomerLoginDetails"].ToString());
+                        BillingDetails();
+
+                        txtguestemail.Enabled = false;
+                    }
+                    //else
+                    //{
+                    //   // divAddNewAddress.Attributes.Add("class", "templates");   // Show
+                    //    this.bindState();
+                    //}
+                    //lblCurrentLoginId.Text = "Signed in as " + Session["CustomerLoginDetails"].ToString();
+                    lblhead1.Text = "Signed in as " + Session["CustomerLoginDetails"].ToString();
+                    //lblCurrentLoginId.Visible = true;
+                    //btnChangeLogin.Visible = true;
+                    //btnLogin.Visible = false;
+                    // addAddress.Visible = true;
+                    btnPlaceOrder.Enabled = true;
+
+                    insertTempCart();
+                }
+                else
+                {
+                    //lblCurrentLoginId.Text = "Login not found.";
+                    lblhead1.Text = "";
+                    //btnChangeLogin.Visible = false;
+                    //btnLogin.Visible = true;
+                    //addAddress.Disabled = true;
+                    btnPlaceOrder.Enabled = false;
+                }
+                //if (Session["CustomerLoginDetails"] == null)
+                //{
+                //    // lbllogin.Text = "To continue process, please login or checkout as guest.";
+                //}
+
+                int TotalQty = 0;
+                TotalQty = (from DataRow drCart in dtCart.AsEnumerable() select (Convert.ToInt32(drCart["quantity"]))).Sum();
+
+                // On Product get 20 % and 30 % offer for 3/4 Days
+                //if (TotalQty >= 2)
+                //{
+                //    AddToShoppingCart(TotalQty);
+                //}
+                //else
+                //{
+                if (Session["couponCodeName"] != null)
+                    {
+                        txtCouponCode.Text = Session["couponCodeName"].ToString();
+                        lbtnApply_Click(lbtnApply, null);
+                    }
+                    AddToShoppingCart(TotalQty);
+                  
+                //}
+                SetActiveSteps();
+                //otpbox.Visible = false;
+            }
+
+        }
+        #endregion
+
+        #region Guest Details
+
+        protected bool GuestUserCheck()
+        {
+            Guid customer_id = Guid.NewGuid();
+            bool result = false;
+
+            security scty = new security();
+            customer_handler customerHandler = new customer_handler();
+            BusinessEntities.customer customer = new BusinessEntities.customer();
+
+            //customer.full_name = txtGuestUserName.Text;
+            customer.email_id = txtguestemail.Text;
+            customer.customer_id = customer_id;
+
+            DataSet ds = customerHandler.check_guest_loginid(txtguestemail.Text);
+            if (ds != null && ds.Tables.Count > 0)
+            {
+                DataTable dt = ds.Tables[0];
+                if (dt.Rows.Count > 0)
+                {
+                    string loginType = dt.Rows[0]["login_type"].ToString();
+                    Session["loginType"] = loginType;
+                    customer_id = Guid.Parse(dt.Rows[0]["customer_id"].ToString());
+                    customer.customer_id = customer_id;
+
+                    if (loginType == "register")
+                    {
+                        lblMsgGuest.Text = "This email is already registered, please choose another one.";
+                    }
+                    else
+                    {
+                        //result = customerHandler.insert_update_guest_customer(customer, ref customer_id);
+                        //if (result)
+                        //{
+
+                        result = true;
+                        Session["CustomerLoginDetails"] = txtguestemail.Text;
+                        Session["customerDetailsId"] = customer_id.ToString();
+
+                        //bindDeliveryDetails(Session["CustomerLoginDetails"].ToString());
+                        //BillingDetails();
+                        //}
+                    }
+                }
+                else
+                {
+                    result = customerHandler.insert_update_guest_customer(customer, ref customer_id);
+                    if (result)
+                    {
+                        Session["CustomerLoginDetails"] = txtguestemail.Text;
+                        //Session["cusDetailsId"] = customer_id.ToString();
+                        Session["customerDetailsId"] = customer_id.ToString();
+
+                        //bindDeliveryDetails(Session["CustomerLoginDetails"].ToString());
+                        //BillingDetails();
+                    }
+                    else
+                    {
+                        lblMsgGuest.Text = "This email is already registered, please choose another one.";
+                    }
+                }
+
+                if (result)
+                {
+                    //lblCurrentLoginId.Text = "Signed in as " + Session["CustomerLoginDetails"].ToString();
+                    lblhead1.Text = "Signed in as " + Session["CustomerLoginDetails"].ToString();
+                    //lblCurrentLoginId.Visible = true;
+                    //btnChangeLogin.Visible = true;
+                    //btnLogin.Visible = false;
+
+                    lbllogin.Text = "";
+                    //addAddress.Visible = true;
+                    btnPlaceOrder.Enabled = true;
+                    //Response.Redirect("proceedtopayment.aspx");
+                    //divAddNewAddress.Attributes.Add("class", "templates"); 
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            SetActiveSteps();
+            return false;
+        }
+
+        //protected void btnChangeLogin_Click(object sender, EventArgs e)
+        //{
+        //    Session.Remove("CustomerLoginDetails");
+        //    Session.Remove("customerDetailsId");
+        //    txtguestemail.Text = "";
+        //    //lblreceiverName.Text = "";
+        //    //lblreceiverAddress.Text = "";
+        //    //lblreceiverCity.Text = "";
+        //    //lblreceiverState.Text = "";
+        //    //lblreceiverPincode.Text = "";
+        //    //lblreceiverMobile.Text = "";
+
+        //    lblCurrentLoginId.Text = "Login not found.";
+        //    lblhead1.Text = "";
+        //   lblhead2.Text = "";
+        //    lblCurrentLoginId.Visible = true;
+        //    btnChangeLogin.Visible = false;
+        //    btnLogin.Visible = true;
+        //  //divAddNewAddress.Attributes.Add("class", "templates hidden");   // Hide
+
+        //    lbllogin.Text = "";
+        //    //addAddress.Disabled = true;
+        //    btnPlaceOrder.Enabled = false;
+
+        //    //repReceiverAddress.DataSource = null;
+        //    //repReceiverAddress.DataBind();
+
+        //    txtguestemail.Focus();
+        //    SetActiveSteps();
+        //}
+
+        #endregion
+
+        #region Billing Details
+
+        private void GetBillingDetails()
+        {
+            if (Session["CustomerData"] != null)
+            {
+                DataTable dtCustomerData = (DataTable)Session["CustomerData"];
+                Session["customerDetailsId"] = dtCustomerData.Rows[0]["customer_id"].ToString();
+                hfpersonaName.Value = dtCustomerData.Rows[0]["full_name"].ToString();
+                hfpersonamobile.Value = dtCustomerData.Rows[0]["contact_number"].ToString();
+                this.bindState();
+            }
+        }
+
+        protected void BillingDetails()
+        {
+            bool result = false;
+            Guid customer_id = Guid.Empty;
+            //if (Session["cusDetailsId"] != null)
+            if (Session["customerDetailsId"] != null)
+            {
+                //customer_id = Guid.Parse(Session["cusDetailsId"].ToString());
+                customer_id = Guid.Parse(Session["customerDetailsId"].ToString());
+            }
+            security scty = new security();
+            customer_handler customerHandler = new customer_handler();
+            BusinessEntities.customer customer = new BusinessEntities.customer();
+
+            customer.email_id = Session["CustomerLoginDetails"].ToString();
+            customer.customer_name = hfpersonaName.Value;
+            customer.contact_number = hfpersonamobile.Value;
+
+            result = customerHandler.update_guest_customer(customer, ref customer_id);
+            if (result)
+            {
+                if (Session["CustomerData"] != null)
+                {
+                    DataTable dtCustomerData = (DataTable)Session["CustomerData"];
+                    DataRow drCustomerData = dtCustomerData.NewRow();
+                    drCustomerData["customer_id"] = Guid.Parse(customer_id.ToString());
+                    Session["CustomerLoginDetails"] = customer.email_id;
+                    drCustomerData["full_name"] = customer.customer_name;
+                    Session["CutomerName"] = customer.customer_name;
+                    drCustomerData["contact_number"] = customer.contact_number;
+                    dtCustomerData.Rows.Add(drCustomerData);
+
+                    Session["CustomerData"] = dtCustomerData;
+
+                    // PanelLogin(); //close Pick The Most Convenient Option and open Billing Details.
+                    this.GetBillingDetails();
+                }
+            }
+            else
+            {
+                lblSignupMsg.Text = "This email/mobile is already registered, please choose another one.";
+            }
+            //Billing();   //close Billing Details and open Delivery Details.
+            //PanelAddress();
+            BindReceiverAddressData(Guid.Parse(Session["customerDetailsId"].ToString()));
+        }
+
+
+
+        #endregion
+
+        #region Delivery Details
+
+        private void bindDeliveryDetails(string CustomerDataEmailId)
+        {
+            customer_handler customerHandler = new customer_handler();
+            DataSet ds = customerHandler.get_customer_login_details(CustomerDataEmailId);
+            if (ds != null && ds.Tables.Count > 0)
+            {
+                DataTable dt = ds.Tables[0];
+                if (dt.Rows.Count > 0)
+                {
+                    Session["customerDetailsId"] = dt.Rows[0]["customer_id"].ToString();
+                    Session["CutomerName"] = dt.Rows[0]["customer_name"].ToString();
+                    hfpersonaName.Value = dt.Rows[0]["customer_name"].ToString();
+                    hfpersonamobile.Value = dt.Rows[0]["contact_number"].ToString();
+                }
+            }
+        }
+
+        //protected void btnChangeOrderSummary_Click(object sender, EventArgs e)
+        //{
+        //    //  this.PanelPayment();
+        //    this.AddToShoppingCart();
+        //}
+
+        #region state/city/pincode
+        private void bindState()
+        {
+            pincode_handler pincodeHandler = new pincode_handler();
+            DataSet ds = pincodeHandler.get_pincode_search("", "", "", 0);
+            if (ds != null && ds.Tables.Count > 0)
+            {
+                DataTable dt = ds.Tables[0];
+                if (dt.Rows.Count > 0)
+                {
+                    ddlReceiverState.DataSource = dt;
+                    ddlReceiverState.DataBind();
+                    ddlReceiverState.Items.Insert(0, "Select State");
+                    ddlReceiverCity.Items.Insert(0, "Select City");
+                }
+                else
+                {
+                    ddlReceiverState.Items.Clear();
+                    ddlReceiverState.Items.Insert(0, "Select State");
+                    ddlReceiverCity.Items.Clear();
+                    ddlReceiverCity.Items.Insert(0, "Select City");
+                }
+            }
+        }
+
+        protected void ddlReceiverState_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (ddlReceiverState.SelectedValue == "Select State")
+            {
+                ddlReceiverCity.Items.Clear();
+                ddlReceiverCity.Items.Insert(0, "Select City");
+            }
+            else
+            {
+                string statenamne = ddlReceiverState.SelectedValue;
+                this.BindCity(statenamne);
+            }
+        }
+
+        private void BindCity(string statename)
+        {
+            pincode_handler pincodeHandler = new pincode_handler();
+            DataSet ds = pincodeHandler.get_pincode_search(statename, "", "", 1);
+            if (ds != null && ds.Tables.Count > 0)
+            {
+                ddlReceiverCity.DataSource = ds.Tables[0];
+                ddlReceiverCity.DataBind();
+                ddlReceiverCity.Items.Insert(0, "Select City");
+            }
+            else
+            {
+                ddlReceiverCity.Items.Clear();
+                ddlReceiverCity.Items.Insert(0, "Select City");
+            }
+        }
+
+        #endregion
+
+        protected void btnProceedToPayment_Click(object sender, EventArgs e)  ////////////Delivery Details Button
+        {
+            if (Session["CustomerLoginDetails"] == null)
+            {
+                if (!GuestUserCheck())
+                    return;
+            }
+            receiver_address receiverAddress = new receiver_address();
+
+            receiverAddress.customer_details_id = 0;
+            receiverAddress.customer_id = Guid.Parse(Session["customerDetailsId"].ToString());
+            receiverAddress.full_name = txtreceivername.Text + (string.IsNullOrEmpty(txtreceiverlastname.Text) ? "" : " " + txtreceiverlastname.Text);
+            receiverAddress.contact_number = txtreceiverphone.Text;
+            receiverAddress.email_id = Session["CustomerLoginDetails"].ToString();
+            receiverAddress.address = txtreceiveraddress.Text;
+            receiverAddress.land_mark = txtLandMark.Text;
+            receiverAddress.city = ddlReceiverCity.SelectedValue;
+            receiverAddress.state = ddlReceiverState.SelectedValue;
+            receiverAddress.pin_code = txtReceiverPinCode.Text;
+
+            receiver_address_handler receiverAddressHandler = new receiver_address_handler();
+            //if (Session["customer_details_id"] != null)
+            //{
+            //    // this.PanelOrderSummary();  //close Delivery Details and open Order Summary.
+            //    this.AddToShoppingCart();
+            //}
+            //else
+            //{
+            bool result = receiverAddressHandler.insert_customer_address(receiverAddress);
+
+            if (Session["CutomerName"] == null || string.IsNullOrEmpty(Convert.ToString(Session["CutomerName"])))
+                Session["CutomerName"] = txtreceivername.Text;
+
+            if (result)
+            {
+                //  this.PanelOrderSummary();  //close Delivery Details and open Order Summary.
+                //this.AddToShoppingCart();
+            }
+            //}
+            //lblreceiverName.Text = txtreceivername.Text + (string.IsNullOrEmpty(txtreceiverlastname.Text) ? "" : " " + txtreceiverlastname.Text);
+            //lblreceiverAddress.Text = txtreceiveraddress.Text + (string.IsNullOrEmpty(txtLandMark.Text) ? "" : ", " + txtLandMark.Text);
+            //lblreceiverCity.Text = ", " + ddlReceiverCity.SelectedValue;
+            //lblreceiverState.Text = ddlReceiverState.SelectedValue;
+            //lblreceiverPincode.Text = "- " + txtReceiverPinCode.Text;
+            //lblreceiverMobile.Text = txtreceiverphone.Text;
+
+            //lblhead2.Text = txtreceiveraddress.Text + ", " + ddlReceiverCity.SelectedValue + ", " + ddlReceiverState.SelectedValue + " - " + txtReceiverPinCode.Text;
+
+            //divAddNewAddress.Attributes.Add("class", "templates");   // Hide
+
+            if (Convert.ToString(Session["loginType"]) == "register")
+            {
+                DataSet dsReceiverAddress = receiverAddressHandler.get_customer_address(Guid.Parse(Session["customerDetailsId"].ToString()));
+                //repReceiverAddress.DataSource = dsReceiverAddress.Tables[0];
+                //repReceiverAddress.DataBind();
+            }
+            else
+                updateTempCart();
+
+            ViewState["steps"] = "2";
+            SetActiveSteps();
+        }
+
+        private void BindReceiverAddressData(Guid customer_id)   //Saved Addresses in Delivery Details
+        {
+            receiver_address_handler receiverAddressHandler = new receiver_address_handler();
+            DataSet dsReceiverAddress = receiverAddressHandler.get_customer_address(customer_id);
+            if (dsReceiverAddress.Tables[0].Rows.Count > 0)
+            {
+                DataTable dtrece = dsReceiverAddress.Tables[0];
+
+                headReceiverAddress.Visible = true;
+                repReceiverAddress.DataSource = dtrece;
+                repReceiverAddress.DataBind();
+
+                //lblreceiverName.Text = dtrece.Rows[0]["full_name"].ToString();
+                //lblreceiverAddress.Text = dtrece.Rows[0]["address"].ToString();
+                //lblreceiverCity.Text = ", " + dtrece.Rows[0]["city"].ToString();
+                //lblreceiverState.Text = dtrece.Rows[0]["state"].ToString();
+                //lblreceiverPincode.Text = "- " + dtrece.Rows[0]["pin_code"].ToString();
+                //lblreceiverMobile.Text = dtrece.Rows[0]["contact_number"].ToString();
+
+                //divAddNewAddress.Attributes.Add("class", "templates hidden");   // Hide
+
+                // lblhead2.Text = lblreceiverAddress.Text + ", " + lblreceiverCity.Text + ", " + lblreceiverState.Text + " - " + lblreceiverPincode.Text;
+            }
+            else
+            {
+                headReceiverAddress.Visible = false;
+                repReceiverAddress.DataSource = null;
+                repReceiverAddress.DataBind();
+
+                //repReceiverAddress.DataSource = null;
+                //repReceiverAddress.DataBind();
+
+                //lblreceiverName.Text = "";
+                //lblreceiverAddress.Text = "";
+                //lblreceiverCity.Text = "";
+                //lblreceiverState.Text = "";
+                //lblreceiverPincode.Text = "";
+                //lblreceiverMobile.Text = "";
+                // divAddNewAddress.Attributes.Add("class", "templates");   // Show
+                //  lblhead2.Text = "";
+
+                // ClearAddress();
+            }
+        }
+
+        //private void ClearAddress()
+        //{
+        //    txtreceivername.Text = string.Empty;
+        //    txtreceiverlastname.Text = string.Empty;
+        //    txtreceiverphone.Text = string.Empty;
+        //    txtreceiveraddress.Text = string.Empty;
+        //    txtLandMark.Text = string.Empty;
+        //    ddlReceiverState.SelectedIndex = -1;
+        //    ddlReceiverCity.SelectedIndex = -1;
+        //    txtReceiverPinCode.Text = string.Empty;
+        //    txtreceivermessage.Text = string.Empty;
+        //}
+
+        protected void repReceiverAddress_ItemCommand(object source, RepeaterCommandEventArgs e)
+        {
+            //if (e.CommandName == "Update")
+            //{
+
+            //}
+            //else if (e.CommandName == "Remove")
+            //{
+            //    if (Session["Cart"] != null)
+            //    {
+            //        Int64 customer_details_id = Convert.ToInt64(e.CommandArgument.ToString());
+            //        receiver_address_handler receiverAddressHandler = new receiver_address_handler();
+            //        DataSet dsReceiverAddress = receiverAddressHandler.delete_save_customer_address(customer_details_id);
+            //        BindReceiverAddressData(Guid.Parse(Session["customerDetailsId"].ToString()));
+            //    }
+            //    //SetActiveSteps();
+            //}
+            if (e.CommandName == "useThisAddress")
+            {
+                Int64 customer_details_id = Convert.ToInt64(e.CommandArgument.ToString());
+                receiver_address_handler receiverAddressHandler = new receiver_address_handler();
+                DataSet dsReceiverAddress = receiverAddressHandler.get_save_customer_address(customer_details_id);
+                if (dsReceiverAddress != null && dsReceiverAddress.Tables.Count > 0)
+                {
+                    DataTable dt = dsReceiverAddress.Tables[0];
+                    if (dt.Rows.Count > 0)
+                    {
+                        //Session["customer_details_id"] = customer_details_id.ToString();
+                        Session["email_id"] = dt.Rows[0]["email_id"].ToString();
+                        string fullName = dt.Rows[0]["full_name"].ToString();
+                        if (fullName.Contains(' '))
+                        {
+                            txtreceivername.Text = fullName.Split(' ').GetValue(0).ToString();
+                            txtreceiverlastname.Text = fullName.Split(' ').GetValue(1).ToString();
+                        }
+                        else
+                            txtreceivername.Text = fullName;
+
+                        txtreceiverphone.Text = dt.Rows[0]["contact_number"].ToString();
+                        txtreceiveraddress.Text = dt.Rows[0]["address"].ToString();
+                        //txtreceiveraddress1.Text = dt.Rows[0]["Address2"].ToString();
+                        txtLandMark.Text = dt.Rows[0]["land_mark"].ToString();
+
+                        string statename = dt.Rows[0]["State"].ToString();
+
+                        ddlReceiverState.SelectedValue = statename.ToString();
+
+                        BindCity(statename);
+
+                        string cityname = dt.Rows[0]["city"].ToString();
+                        ddlReceiverCity.SelectedValue = cityname.ToString();
+                        ddlReceiverCity.SelectedValue = dt.Rows[0]["city"].ToString();
+                        txtReceiverPinCode.Text = dt.Rows[0]["pin_code"].ToString();
+                        txtreceivermessage.Text = dt.Rows[0]["message"].ToString();
+
+                        //this.AddToShoppingCart();
+
+                        //lblreceiverName.Text = dt.Rows[0]["full_name"].ToString();
+                        //lblreceiverAddress.Text = dt.Rows[0]["address"].ToString();
+                        //lblreceiverCity.Text = ", " + dt.Rows[0]["city"].ToString();
+                        //lblreceiverState.Text = dt.Rows[0]["state"].ToString();
+                        //lblreceiverPincode.Text = "- " + dt.Rows[0]["pin_code"].ToString();
+                        //lblreceiverMobile.Text = dt.Rows[0]["contact_number"].ToString();
+
+                        //divAddNewAddress.Attributes.Add("class", "templates hidden");   // Hide
+
+                        //lblhead2.Text = lblreceiverAddress.Text + ", " + lblreceiverCity.Text + ", " + lblreceiverState.Text + " - " + lblreceiverPincode.Text;
+                    }
+                }
+                updateTempCart();
+                SetActiveSteps();
+            }
+        }  ////////// use this address button in Delivery Details
+
+        #endregion
+
+        #region Order summary
+
+
+        private void AddToShoppingCart(int TotalQty)  ///////////////bind product Details in Order Summary
+        {
+            string ProductIds = "";
+            //byte CouponGenderType = 0;
+            //Session["CouponAmount"] = "0";
+            lblQtyCount.Text = TotalQty.ToString();
+            DataTable dtCart = (DataTable)Session["Cart"];
+            //////DataTable dtCoupon = null;
+            if (dtCart != null && dtCart.Rows.Count > 0)
+            {
+                ViewState["FirstProId"] = dtCart.Rows[0]["product_id"].ToString();
+                ViewState["proName"] = dtCart.Rows[0]["product_name"].ToString();
+                ViewState["proQty"] = dtCart.Rows[0]["quantity"].ToString();
+                // ViewState["Price"] = dtCart.Rows[0]["price"].ToString();
+              
+                ViewState["thumbImg"] = dtCart.Rows[0]["thumb_image"].ToString();
+                lblCartCount.Text = dtCart.Rows.Count.ToString();
+                //SubTotal Amount
+                Decimal amount = (from DataRow drCart in dtCart.AsEnumerable()
+                                  where drCart.RowState != DataRowState.Deleted
+                                  select (Convert.ToDecimal(drCart["Total"]))).Sum();
+
+
+                if (amount > 750)
+                    lblShipping.Text = "0.00";
+                else
+                    lblShipping.Text = String.Format("{0:0.00}", Convert.ToDecimal(ConfigurationManager.AppSettings["shippingcharge"]));
+
+                Decimal totalAmount = (from DataRow drCart in dtCart.AsEnumerable()
+                                       where drCart.RowState != DataRowState.Deleted
+                                       select (Convert.ToDecimal(drCart["sale_price"]) * Convert.ToDecimal(drCart["quantity"]))).Sum();
+                lblTotalPrice.Text = String.Format("{0:0.00}", totalAmount);
+
+                decimal salesPrice = (from DataRow drCart in dtCart.AsEnumerable()
+                                      where drCart.RowState != DataRowState.Deleted
+                                      select (Convert.ToDecimal(drCart["sale_price"]))).Sum();
+
+                decimal DiscountPer = 0;
+                // On Product get 20 % and 30 % offer for 3/4 Days
+                //if (TotalQty == 2)
+                //{
+                //    DiscountPer = Convert.ToDecimal(ConfigurationManager.AppSettings["disconton2qty"]);
+                //    lblMsgCoupon.ForeColor = System.Drawing.Color.Green;
+                //    lblMsgCoupon.Text = "Congratulations ! You get "+ DiscountPer.ToString() + "% Discount.";
+                //    txtCouponCode.Enabled = false;
+                //    lbtnApply.Enabled = false;
+                //}
+                //else if (TotalQty > 2)
+                //{
+                //    DiscountPer = Convert.ToDecimal(ConfigurationManager.AppSettings["disconton3qty"]);
+                //    lblMsgCoupon.ForeColor = System.Drawing.Color.Green;
+                //    lblMsgCoupon.Text = "Congratulations ! You get " + DiscountPer.ToString() + "% Discount.";
+                //    txtCouponCode.Enabled = false;
+                //    lbtnApply.Enabled = false;
+                //}
+                decimal TotalDiscount = 0;
+                //if (TotalQty == 1)
+                //{
+                    decimal FlatDiscount = (from DataRow drCart in dtCart.AsEnumerable()
+                                            where drCart.RowState != DataRowState.Deleted
+                                            select ((Convert.ToDecimal(drCart["sale_price"]) * Convert.ToDecimal(drCart["discount"]) / 100) * Convert.ToDecimal(drCart["quantity"]))).Sum();
+
+                    decimal couponDiscount = (from DataRow drCart in dtCart.AsEnumerable()
+                                              where drCart.RowState != DataRowState.Deleted
+                                              select (Convert.ToDecimal(drCart["coupon_discount"]))).Sum();
+                    TotalDiscount = FlatDiscount + couponDiscount;
+                  //  lblQtyCount.Text = TotalQty.ToString();
+                //}
+                //else
+                //{
+                //    TotalDiscount = (totalAmount * DiscountPer) / 100;
+                //}
+                ViewState["salPrice"] = salesPrice;
+
+                lblDiscount.Text = String.Format("{0:0.00}", TotalDiscount);
+                Session["CouponAmount"] = TotalDiscount;
+                ViewState["ShippingCharge"] = lblShipping.Text;
+
+                Decimal grandTotal = totalAmount - TotalDiscount + Convert.ToDecimal(lblShipping.Text);
+                lblGrandTotal.Text = String.Format("{0:0.00}", grandTotal);
+                btnPlaceOrder.Text = String.Format("Pay Rs.{0:0.00}", grandTotal);
+                Session["grdTotal"] = lblGrandTotal.Text.ToString();
+
+                int product_id = Convert.ToInt32(ViewState["FirstProId"].ToString());
+
+                foreach (DataRow row in dtCart.Rows)
+                {
+                    ProductIds += "'" + row["product_id"] + "',";
+                    if (int.Parse(row["product_id"].ToString()) == product_id)
+                    {
+                        //row["Total"] = lblGrandTotal.Text;
+                        row["shipping_price"] = ViewState["ShippingCharge"].ToString();
+                    }
+                }
+
+                dlCart.DataSource = dtCart;
+                dlCart.DataBind();
+                //lbl3OrderSummary.Text = "Total Amount Payable: Rs. " + lblGrandTotal.Text;
+
+                string FacebookPixelCode = @"
+                fbq('track', 'InitiateCheckout', {
+                content_ids: [" + ProductIds.Remove(ProductIds.Length - 1) + @"],
+                content_type: 'product',
+                value: " + lblGrandTotal.Text + @",
+                currency: 'INR'
+                });";
+                ScriptManager.RegisterClientScriptBlock(this, this.GetType(), "FacebookPixelCode", FacebookPixelCode, true);
+            }
+            else if (dtCart != null && dtCart.Rows.Count == 0)
+            {
+                dlCart.DataSource = dtCart;
+                dlCart.DataBind();
+
+                //lbl3OrderSummary.Text = "Total Amount Payable: Rs. " + lblGrandTotal.Text;
+                btnPlaceOrder.Text = "Pay";
+                lblTotalPrice.Text = "0";
+                lblShipping.Text = "0";
+                lblDiscount.Text = "0";
+                lblGrandTotal.Text = "0";
+            }
+        }
+
+        private Decimal GetTaxAmount(Decimal subTotal, Decimal taxPercentage)
+        {
+            Decimal IA = (subTotal * 100) / (100 + taxPercentage);
+            Decimal TA = (taxPercentage / 100) * IA;
+            return TA;
+        }
+
+        protected string GetDiscountDetails(Decimal discountPrice)
+        {
+            string discountDetails = string.Empty;
+            if (discountPrice > 0)
+            {
+                discountDetails = String.Format("{0:0}% discount", discountPrice);
+            }
+            return discountDetails;
+        }
+
+        #endregion
+
+        #region POST Form
+
+        public string Generatehash512(string text)
+        {
+            byte[] message = Encoding.UTF8.GetBytes(text);
+
+            UnicodeEncoding UE = new UnicodeEncoding();
+            byte[] hashValue;
+            SHA512Managed hashString = new SHA512Managed();
+            string hex = "";
+            hashValue = hashString.ComputeHash(message);
+            foreach (byte x in hashValue)
+            {
+                hex += String.Format("{0:x2}", x);
+            }
+            return hex;
+
+        }
+
+        private string PreparePOSTForm(string url, System.Collections.Hashtable data)      // post form
+        {
+            //Set a name for the form
+            string formID = "PostForm";
+            //Build the form using the specified data to be posted.
+            StringBuilder strForm = new StringBuilder();
+            strForm.Append("<form id=\"" + formID + "\" name=\"" +
+                           formID + "\" action=\"" + url +
+                           "\" method=\"POST\">");
+
+            foreach (System.Collections.DictionaryEntry key in data)
+            {
+
+                strForm.Append("<input type=\"hidden\" name=\"" + key.Key +
+                               "\" value=\"" + key.Value + "\">");
+            }
+
+
+            strForm.Append("</form>");
+            //Build the JavaScript which will do the Posting operation.
+            StringBuilder strScript = new StringBuilder();
+            strScript.Append("<script language='javascript'>");
+            strScript.Append("var v" + formID + " = document." +
+                             formID + ";");
+            strScript.Append("v" + formID + ".submit();");
+            strScript.Append("</script>");
+            //Return the form and the script concatenated.
+            //(The order is important, Form then JavaScript)
+            return strForm.ToString() + strScript.ToString();
+        }
+
+        #endregion
+
+        #region payment methord
+
+        public class RemotePost
+        {
+            private System.Collections.Specialized.NameValueCollection Inputs = new System.Collections.Specialized.NameValueCollection();
+
+            public string Url = "";
+            public string Method = "post";
+            public string FormName = "form1";
+
+            public void Add(string name, string value)
+            {
+                Inputs.Add(name, value);
+            }
+
+            public void Post()
+            {
+                System.Web.HttpContext.Current.Response.Clear();
+
+                System.Web.HttpContext.Current.Response.Write("<html><head>");
+
+                System.Web.HttpContext.Current.Response.Write(string.Format("</head><body onload=\"document.{0}.submit()\">", FormName));
+                System.Web.HttpContext.Current.Response.Write(string.Format("<form name=\"{0}\" method=\"{1}\" action=\"{2}\" >", FormName, Method, Url));
+                for (int i = 0; i < Inputs.Keys.Count; i++)
+                {
+                    System.Web.HttpContext.Current.Response.Write(string.Format("<input name=\"{0}\" type=\"hidden\" value=\"{1}\">", Inputs.Keys[i], Inputs[Inputs.Keys[i]]));
+                }
+                System.Web.HttpContext.Current.Response.Write("</form>");
+                System.Web.HttpContext.Current.Response.Write("</body></html>");
+
+                System.Web.HttpContext.Current.Response.End();
+            }
+        }
+
+        public string Generatetxnid()
+        {
+            Random rnd = new Random();
+            string strHash = Generatehash512(rnd.ToString() + DateTime.Now);
+            string txnid1 = strHash.ToString().Substring(0, 20);
+            return txnid1;
+        }
+
+        #endregion
+
+        //#region Cart remove/update
+
+        //protected void dlCart_ItemDataCommond(object source, RepeaterCommandEventArgs e)
+        //{
+        //    int qty = 1;
+        //    int txtqty = 1;
+        //    string proname = "";
+
+        //    if (e.CommandName == "add" || e.CommandName == "minus")
+        //    {
+        //        TextBox txtQty = (TextBox)e.Item.FindControl("txtquantity");
+        //        if (e.CommandName == "add")
+        //            txtQty.Text = (Convert.ToInt16(txtQty.Text) + 1).ToString();
+        //        else
+        //            txtQty.Text = (Convert.ToInt16(txtQty.Text) - 1).ToString();
+
+        //        if (Convert.ToInt32(txtQty.Text) <= 0)
+        //        {
+        //            txtQty.Text = "1";
+        //            lblQtyMsg.Text = "Hi, Quantity value must be more then zero.";
+        //            return;
+        //        }
+
+        //        int ProductID = Convert.ToInt32(e.CommandArgument);
+        //        DataTable dtCart = (DataTable)Session["Cart"];
+        //        foreach (DataRow row in dtCart.Rows)
+        //        {
+        //            Session["qty"] = Convert.ToInt32(txtQty.Text);
+        //            if (int.Parse(row["product_id"].ToString()) == ProductID)
+        //            {
+
+        //                row["quantity"] = Convert.ToInt32(txtQty.Text);
+        //                Decimal Price = Convert.ToDecimal(row["sale_price"]);
+        //                Decimal discount = Convert.ToDecimal(row["discount"]);
+        //                Decimal UnitPriceOnDiscount = discount > 0 ? Price - (Price * discount / 100) : Price;
+        //                product_handler productsHandler = new product_handler();
+        //                DataSet dsqty = productsHandler.get_search_quantity(ProductID);
+        //                if (dsqty != null && dsqty.Tables.Count > 0)
+        //                {
+        //                    DataTable dtqty = dsqty.Tables[0];
+        //                    if (dtqty.Rows.Count > 0)
+        //                    {
+        //                        qty = Convert.ToInt32(dtqty.Rows[0]["quantity"].ToString());
+        //                        txtqty = Convert.ToInt32(txtQty.Text);
+        //                        proname = dtqty.Rows[0]["product_name"].ToString();
+
+        //                        if (qty >= txtqty)
+        //                        {
+        //                            row["Total"] = Convert.ToInt32(row["quantity"]) * UnitPriceOnDiscount;
+        //                            Session["Cart"] = dtCart;
+        //                            AddToShoppingCart();
+        //                            lblQtyMsg.Text = "";
+        //                            break;
+        //                        }
+        //                        else
+        //                        {
+        //                            row["quantity"] = qty;
+        //                            row["Total"] = Convert.ToInt32(row["quantity"]) * UnitPriceOnDiscount;
+        //                            Session["Cart"] = dtCart;
+        //                            AddToShoppingCart();
+        //                            lblQtyMsg.Text = "Hi, only <b>" + qty + "</b> quantity of <b>" + proname + "</b> is available at this time.";
+        //                            break;
+        //                        }
+        //                    }
+        //                    else
+        //                    {
+
+        //                    }
+        //                }
+        //                AddToShoppingCart();
+        //            }
+        //        }
+
+        //    }
+        //    else if (e.CommandName == "Remove")
+        //    {
+        //        if (Session["Cart"] != null)
+        //        {
+        //            DataTable dt = (DataTable)Session["Cart"];
+        //            dt.Rows.RemoveAt(e.Item.ItemIndex);
+        //            Session["Cart"] = dt;
+        //            AddToShoppingCart();
+        //        }
+        //    }
+        //}
+
+        //#endregion
+
+        //#region apply coupon code
+
+        private Decimal GetCouponAmount(Decimal amount, Decimal coupcode)
+        {
+            Decimal CA = amount - (amount * coupcode) / 100;
+            Decimal TCA = amount - CA;
+            return TCA;
+        }
+
+        protected void lbtnApply_Click(object sender, EventArgs e)
+        {
+
+            byte CouponGenderType = 0;
+            Decimal CouponAmount = 0, CouponPrice = 0; //Coupon %
+            short countCouponAppliedProduct = 0;
+
+            DataTable dtCart = (DataTable)Session["Cart"];
+            product_handler productHandler = new product_handler();
+
+            DataTable dtCoupon = null;
+            dtCoupon = productHandler.get_coupon_code(txtCouponCode.Text, 0, 0, 0).Tables[0];
+            if (dtCoupon.Rows.Count > 0 && dtCoupon.Rows[0]["price"] != DBNull.Value)
+            {
+                CouponPrice = Convert.ToDecimal(dtCoupon.Rows[0]["price"]);
+                Session["couponcodeprice"] = CouponPrice;
+                Session["couponCodeName"] = txtCouponCode.Text;
+
+            }
+            else
+            {
+                lblMsgCoupon.ForeColor = System.Drawing.Color.Red;
+                lblMsgCoupon.Text = "Coupon Code is Invalid.";
+                Session["couponcodeprice"] = null;
+                return;
+            }
+
+
+            // Apply coupon discount Gender wise
+            if (dtCoupon.Rows[0]["gendertype"] != DBNull.Value)
+            {
+                CouponGenderType = Convert.ToByte(dtCoupon.Rows[0]["gendertype"]);
+
+                foreach (DataRow cartRow in dtCart.Rows)
+                {
+                    if (cartRow["discount"] != DBNull.Value && Convert.ToInt32(cartRow["discount"]) > 0)
+                    {
+                        // No need to count discount. Already available.
+                    }
+                    else if (cartRow["gendertype"] != DBNull.Value && cartRow["gendertype"].ToString() == dtCoupon.Rows[0]["gendertype"].ToString())
+                    {
+                        CouponAmount = GetCouponAmount(Convert.ToDecimal(cartRow["Total"]), CouponPrice);
+                        cartRow["coupon_discount"] = CouponAmount;
+                        countCouponAppliedProduct++;
+                    }
+                }
+                //lblMsgCoupon.ForeColor = System.Drawing.Color.Green;
+                //lblMsgCoupon.Text = (CouponGenderType == 1 ? "Men" : "Women") + " Coupon code applied successfully on "+countCouponAppliedProduct.ToString()+" product(s).";
+            }
+            else
+            {
+                foreach (DataRow cartRow in dtCart.Rows)
+                {
+                    if (cartRow["discount"] != DBNull.Value && Convert.ToInt32(cartRow["discount"]) > 0)
+                    {
+                        // No need to count discount. Already available.
+                    }
+                    else
+                    {
+                        CouponAmount = GetCouponAmount(Convert.ToDecimal(cartRow["Total"]), CouponPrice);
+                        cartRow["coupon_discount"] = CouponAmount;
+                        countCouponAppliedProduct++;
+                    }
+                }
+                //lblMsgCoupon.ForeColor = System.Drawing.Color.Green;
+                //lblMsgCoupon.Text = "Coupon code applied successfully on " + countCouponAppliedProduct.ToString() + " product(s).";
+            }
+            if (countCouponAppliedProduct > 0)
+            {
+                lblMsgCoupon.ForeColor = System.Drawing.Color.Green;
+                lblMsgCoupon.Text = "Coupon code applied successfully on " + countCouponAppliedProduct.ToString() + " product(s).";
+                Session["CouponAmount"] = (from DataRow drCart in dtCart.AsEnumerable()
+                                           where drCart.RowState != DataRowState.Deleted
+                                           select (Convert.ToDecimal(drCart["coupon_discount"]))).Sum();
+            }
+            else
+            {
+                lblMsgCoupon.ForeColor = System.Drawing.Color.Red;
+                lblMsgCoupon.Text = "Oops !!! Apologies, This coupon is not valid on products which are already on Sale!";
+            }
+
+            int TotalQty = 0;
+            TotalQty = (from DataRow drCart in dtCart.AsEnumerable() select (Convert.ToInt32(drCart["quantity"]))).Sum();
+
+            AddToShoppingCart(TotalQty);
+
+
+
+            //if (ViewState["itemDiscount"] != null && Convert.ToInt32(ViewState["itemDiscount"]) > 0)
+            //{
+            //    lblMsgCoupon.ForeColor = System.Drawing.Color.Red;
+            //    lblMsgCoupon.Text = "Oops !!! Apologies, This coupon is not valid on products which are already on Sale!";
+            //}
+
+            //product_handler productHandler = new product_handler();
+            //DataSet ds = productHandler.get_search_productId(proId);
+            //if (ds != null && ds.Tables.Count > 0)
+            //{
+            //    DataTable dt = ds.Tables[0];
+            //    if (dt.Rows.Count > 0)
+            //    {
+            //        catid = Convert.ToInt64(dt.Rows[0]["menu_id"].ToString());
+            //        subcatid = Convert.ToInt64(dt.Rows[0]["sub_menu_id"].ToString());
+            //    }
+            //}
+            //DataSet dscpn = new DataSet();
+            //dscpn = productHandler.get_coupon_code(txtCouponCode.Text, catid, subcatid, 0);
+
+            //if (dscpn != null && dscpn.Tables.Count > 0)
+            //{
+            //    DataTable dt = dscpn.Tables[0];
+            //    if (dt.Rows.Count > 0)
+            //    {
+            //        long cId = Convert.ToInt64(dt.Rows[0]["menu_id"].ToString());
+            //        long SbId = Convert.ToInt64(dt.Rows[0]["sub_menu_id"].ToString());
+
+            //        string SndEmail = dt.Rows[0]["sender_email"].ToString();
+            //        string RecEmail = dt.Rows[0]["reciever_email"].ToString();
+
+            //        Session["couponCodeName"] = txtCouponCode.Text;
+
+
+            //        if (RecEmail != null || RecEmail != "")///////////////////////refer friends
+            //        {
+            //            Session["sndemail"] = SndEmail.ToString();
+            //            Session["recemail"] = RecEmail.ToString();
+            //        }
+            //        else
+            //        {
+            //            Session["sndemail"] = null;
+            //            Session["recemail"] = null;
+            //        }
+
+            //        if (dt.Rows[0]["gendertype"] != DBNull.Value)
+            //            CouponGenderType = Convert.ToByte(dt.Rows[0]["gendertype"]);
+
+            //        // Check Gender wise coupon
+            //        DataTable dtCart = (DataTable)Session["Cart"];
+            //        foreach (DataRow cartRow in dtCart.Rows)
+            //        {
+            //            if (cartRow["gendertype"] != DBNull.Value)
+            //            {
+            //                if (Convert.ToByte(cartRow["gendertype"]) == CouponGenderType)
+            //                {
+            //                    ValidGenderCoupon = true;
+            //                    break;
+            //                }
+            //            }
+            //        }
+            //        if (CouponGenderType > 0 && !ValidGenderCoupon)
+            //        {
+            //            lblMsgCoupon.ForeColor = System.Drawing.Color.Red;
+            //            lblMsgCoupon.Text = "Oops !!! Apologies, This coupon is valid only for " + (CouponGenderType == 1 ? "Men" : "Women") + " products!";
+            //            Session["couponcodeprice"] = null;
+            //        }
+            //        else if (cId == catid && SbId == subcatid)   ///////////caregory wise coupon code
+            //        {
+            //            lblMsgCoupon.ForeColor = System.Drawing.Color.Green;
+            //            lblMsgCoupon.Text = "Coupon code applied successfully.";
+            //            Session["couponcodeprice"] = dt.Rows[0]["price"].ToString();
+            //            //AddToShoppingCart();
+            //        }
+            //        else if (cId == 0 && SbId == 0)     ////////////all product used coupon code
+            //        {
+            //            lblMsgCoupon.ForeColor = System.Drawing.Color.Green;
+            //            lblMsgCoupon.Text = "Coupon code applied successfully.";
+            //            Session["couponcodeprice"] = dt.Rows[0]["price"].ToString();
+            //            //AddToShoppingCart();
+            //        }
+            //        else
+            //        {
+            //            lblMsgCoupon.ForeColor = System.Drawing.Color.Red;
+            //            lblMsgCoupon.Text = "Coupon Code is Invalid.";
+            //            Session["couponcodeprice"] = null;
+            //            //AddToShoppingCart();
+            //        }
+
+            //AddToShoppingCart();
+            //}
+            //else
+            //{
+            //    lblMsgCoupon.ForeColor = System.Drawing.Color.Red;
+            //    lblMsgCoupon.Text = "Coupon Code is Invalid.";
+            //    Session["couponcodeprice"] = null;
+            //    //AddToShoppingCart();
+            //}
+
+            //AddToShoppingCart();
+            //}
+        }
+
+        //#endregion
+
+        #region PayUmoney
+
+        private void bindPayUmoneyPayment()
+        {
+            Session["payamount"] = lblGrandTotal.Text;
+            Session["orderName"] = hfpersonaName.Value;
+
+            if (ViewState["proName"] != null)
+            {
+                productinfo.Value = ViewState["proName"].ToString();
+            }
+
+
+            RemotePost myremotepost = new RemotePost();
+            string key = "mZzMRv";
+            string amount = lblGrandTotal.Text;
+            string productInfo = productinfo.Value;
+            string firstName = hfpersonaName.Value;
+            string email = Session["CustomerLoginDetails"].ToString();
+            string phone = hfpersonamobile.Value;
+            string salt = "ZgF6zuS7";
+            //posting all the parameters required for integration.
+
+            if (Session["CustomerLoginDetails"].ToString().Equals("kalpesh013@gmail.com") || Session["CustomerLoginDetails"].ToString().Equals("faizan@carbonmedia.in"))
+                amount = "1.00";
+
+            myremotepost.Url = "https://secure.payu.in/_payment";
+            myremotepost.Add("key", "mZzMRv");
+            string txnid = Generatetxnid();
+            myremotepost.Add("txnid", txnid);
+            myremotepost.Add("amount", amount);
+            myremotepost.Add("productinfo", productInfo);
+            myremotepost.Add("firstname", firstName);
+            myremotepost.Add("phone", phone);
+            myremotepost.Add("email", email);
+
+            myremotepost.Add("surl", System.Configuration.ConfigurationManager.AppSettings["siteUrl"] + "/success.aspx");//Change the success url here depending upon the port number of your local system.
+            myremotepost.Add("furl", System.Configuration.ConfigurationManager.AppSettings["siteUrl"] + "/error.aspx");//Change the failure url here depending upon the port number of your local system.
+
+            myremotepost.Add("service_provider", "payu_paisa");
+            string hashString = key + "|" + txnid + "|" + amount + "|" + productInfo + "|" + firstName + "|" + email + "|||||||||||" + salt;
+            string hash = Generatehash512(hashString);
+            myremotepost.Add("hash", hash);
+
+            myremotepost.Post();
+        }
+
+        #endregion
+
+
+        #region Mobikwik - Unused
+
+        //protected void submitMobikwik_Click(object sender, EventArgs e)
+        //{
+        //    bindProceedToPaymentforMobikwik();
+        //}
+
+        private void bindProceedToPaymentforMobikwik()
+        {
+            try
+            {
+                string generatecode = Utility.generatecode();
+                //Guid customer_id = new Guid(Session["customerDetailsId"].ToString());
+                //order_handler orderHandler = new order_handler();
+                //BusinessEntities.order Order = new BusinessEntities.order();
+                //Order.customer_id = customer_id;
+
+                Guid customer_id = new Guid(Session["customerDetailsId"].ToString());
+                order_handler orderHandler = new order_handler();
+                BusinessEntities.order Order = new BusinessEntities.order();
+                //Order.order_number = generatecode;
+                Order.order_number = customer_id;
+                Order.customer_id = customer_id;
+
+
+
+                Order.user_name = txtreceivername.Text + (string.IsNullOrEmpty(txtreceiverlastname.Text) ? "" : " " + txtreceiverlastname.Text);
+                Order.contact_number = txtreceiverphone.Text;
+                Order.email_id = Session["CustomerLoginDetails"].ToString();
+                //Order.address = txtreceiveraddress.Text + " " + txtreceiveraddress1.Text;
+                Order.address = txtreceiveraddress.Text;
+                Order.land_mark = txtLandMark.Text;
+                Order.city = Session["ReceiverCity"].ToString();
+                Order.state = Session["ReceiverState"].ToString();
+                Order.pin_code = Session["ReceiverPinCode"].ToString();
+                Order.message = txtreceivermessage.Text;
+                Order.PaymentThrough = "MobiKwik";
+                if (Session["CouponAmount"] != null)
+                {
+                    //Order.coupon_price = Session["CouponAmount"].ToString();
+                    Order.discount_price = Session["CouponAmount"].ToString();
+                }
+                //else if (Session["sale_discount"] != null)
+                //{
+                //    Order.discount_price = Session["sale_discount"].ToString();
+                //}
+                //else
+                //{
+                //    Order.coupon_price = "0";
+                //}
+
+                if (Session["couponCodeName"] != null)
+                {
+                    Order.coupon_code = Session["couponCodeName"].ToString();
+                }
+                else
+                {
+                    Order.coupon_code = "";
+                }
+
+                Order.TotalPrice = Session["grdTotal"].ToString();
+
+
+                Order.sale_price = ViewState["salPrice"].ToString();
+                //Order.price = ViewState["Price"].ToString();
+                Order.price = Session["grdTotal"].ToString();
+
+                Order.shipping_price = ViewState["ShippingCharge"].ToString();
+
+
+                //long resultOrder = orderHandler.InsertUpdateOrder(Session);
+                long resultOrder = orderHandler.insert_order(Order);
+                if (resultOrder > 0)
+                {
+                    Order.order_id = Convert.ToInt32(resultOrder);
+                    Session["OrderNumber"] = Order.order_id;
+
+                    DataTable dtCart = (DataTable)Session["Cart"];
+                    if (dtCart != null && dtCart.Rows.Count > 0)
+                    {
+                        for (int i = 0; i < dtCart.Rows.Count; i++)
+                        {
+                            Order.product_id = Convert.ToInt64(dtCart.Rows[i]["product_id"].ToString());
+                            Order.quantity = Convert.ToInt32(dtCart.Rows[i]["quantity"].ToString());
+                            Order.TotalPrice = dtCart.Rows[i]["Total"].ToString();
+                            Order.order_status = "Pending for Admin";
+
+                            //bool resultOrderDetails = orderHandler.InsertOrderDetails(Order);
+                            bool resultOrderDetails = orderHandler.insert_order_detail(Order);
+                            if (resultOrderDetails)
+                            {
+                                // checking and updating stock and out of stock
+                                product_handler productsHandler = new product_handler();
+                                DataSet dsqty = productsHandler.get_search_quantity(Convert.ToInt64(dtCart.Rows[i]["product_id"].ToString()));
+                                if (dsqty != null && dsqty.Tables.Count > 0)
+                                {
+                                    DataTable dtqty = dsqty.Tables[0];
+                                    if (dtqty.Rows.Count > 0)
+                                    {
+                                        qty = Convert.ToInt32(dtqty.Rows[0]["quantity"].ToString());
+                                        txtqty = Convert.ToInt32(dtCart.Rows[i]["quantity"].ToString());
+                                        qtycount = qty - txtqty;
+                                        Order.quantity = qtycount;
+
+                                        if (qty == 0)
+                                        {
+                                            //pending redirect on product detail page.
+                                        }
+
+                                        if (qtycount <= 0)
+                                        {
+                                            Order.in_stock = false;
+                                        }
+                                        else
+                                        {
+                                            Order.in_stock = true;
+                                        }
+
+                                        bool updateQuantity = orderHandler.update_product_quantity(Order);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    Session["email"] = Session["CustomerLoginDetails"].ToString();
+                    Session["amt"] = lblGrandTotal.Text;
+                    Session["cell"] = hfpersonamobile.Value;
+                    //Session["orderid"] = "S2S" + Session["OrderNumber"].ToString();
+                    Session["orderid"] = Session["OrderNumber"].ToString();
+
+                    Response.Redirect("mobindex.aspx");
+                    //SendEmailConfirmOrder("mobokwik"); Send this email from success.aspx page.
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+                Response.Redirect("/");
+            }
+        }
+        #endregion
+
+        #region Payment
+
+        protected void btnPlaceOrder_Click(object sender, EventArgs e)
+        {
+            //if (string.IsNullOrEmpty(lblreceiverAddress.Text))
+            //{
+            //    lblCheckMsg.Visible = true;
+            //    lblCheckMsg.Text = "Please select Delivery Address.";
+            //    return;
+            //}
+
+            //if (txtOTPno.Visible == false && rbtnCashOnDelivery.Checked)
+            //{
+            //    GenerateOTPCode();
+            //    otpbox.Visible = true;
+            //    return;
+            //}
+            //else
+            //{
+            //    if (ViewState["OTP"].ToString() != txtOTPno.Text.Trim())
+            //    {
+            //        lblotpno.Text = "Your OTP invaild.Please enter corret OTP.";
+            //        return;
+            //    }
+            //}
+
+            if (rbtnCashOnDelivery.Checked)
+            {
+                pincode_handler pincodeHandler = new pincode_handler();
+                //if (!pincodeHandler.check_Pincode_COD(lblreceiverPincode.Text.Substring(2)))
+                //{
+                //    lblCheckMsg.Visible = true;
+                //    lblCheckMsg.Text = "Cash on Delivery is not available at this Pincode number.";
+                //    return;
+                //}
+
+                if (InsertOrder("COD"))
+                {
+                    deleteTempCart();
+                    Utility.SendSmsCODConfirmation(txtreceiverphone.Text, txtreceivername.Text, Convert.ToString(Session["OrderNumber"]), Session["grdTotal"].ToString());
+                    Response.Redirect("success.aspx?type=cod");
+                }
+            }
+            else
+            {
+                //if (Session["CustomerLoginDetails"].ToString().Equals("kalpesh013@gmail.com") || Session["CustomerLoginDetails"].ToString().Equals("faizan@carbonmedia.in"))
+                //{
+                    if (InsertOrder("Razorpay"))        // 28-08-2019 Added new Payment gatway.
+                    {
+                        deleteTempCart();
+
+                        //Payment method call from JavaScript
+                        string jsRequest = @"$(function () { $('.razorpay-payment-button').click(); });";
+                        ScriptManager.RegisterClientScriptBlock(this, this.GetType(), "Pay", jsRequest, true);
+                    }
+                //}
+                //else
+                //{
+
+                //    if (InsertOrder("CCAvenue"))
+                //    {
+                //        deleteTempCart();
+                //        SubmitCcAvenue();
+                //    }
+                //}
+
+                //else if (rbtnUseWallet.Checked)
+                //{
+                //    if (InsertOrder("CCAvenue"))
+                //    {
+                //        deleteTempCart();
+                //        SubmitCcAvenue();
+                //    }
+                //}
+                //else
+                //{
+                //    if (InsertOrder("PayUMoney"))
+                //    {
+                //        deleteTempCart();
+                //        bindPayUmoneyPayment();
+                //    }
+                //}
+
+                // Logout if user type is Guest
+                //customer_handler customerHandler = new customer_handler();
+                //DataSet ds = customerHandler.check_guest_loginid(Convert.ToString(Session["CustomerLoginDetails"]));
+                //if (ds.Tables[0].Rows.Count > 0)
+                //{
+                //    if (ds.Tables[0].Rows[0]["login_type"].ToString() == "guest")
+                //    {
+                //        Session.Clear();
+                //        Session.Abandon();
+                //    }
+                //}
+            }
+
+        }
+
+        private bool InsertOrder(string PaymentType)
+        {
+            string generatecode = Utility.generatecode();
+            Guid customer_id = new Guid(Session["customerDetailsId"].ToString());
+            order_handler orderHandler = new order_handler();
+            BusinessEntities.order Order = new BusinessEntities.order();
+            Order.order_number = Guid.NewGuid();
+            //Order.order_number = customer_id; 
+            Order.customer_id = customer_id;
+
+            Order.user_name = txtreceivername.Text + (string.IsNullOrEmpty(txtreceiverlastname.Text) ? "" : " " + txtreceiverlastname.Text);
+            Order.contact_number = txtreceiverphone.Text;
+            Order.email_id = Session["CustomerLoginDetails"].ToString();
+            Order.address = txtreceiveraddress.Text;
+            Order.land_mark = txtLandMark.Text;
+            Order.city = ddlReceiverCity.SelectedItem.Text;
+            Order.state = ddlReceiverState.SelectedItem.Text;
+            Order.pin_code = txtReceiverPinCode.Text;
+            Order.message = txtreceivermessage.Text;
+            Order.PaymentThrough = PaymentType;
+            //Order.coupon_price = "0";
+            Order.discount_price = "0";     // Include only Coupon discount
+
+            if (Session["CouponAmount"] != null)
+            {
+                //Order.coupon_price = Session["CouponAmount"].ToString();
+                Order.discount_price = Session["CouponAmount"].ToString();
+            }
+            //if (Session["sale_discount"] != null)
+            //    Order.discount_price = (Convert.ToSingle(Session["sale_discount"]) + Convert.ToSingle(Order.discount_price)).ToString("0.00"); ;
+
+            if (Session["couponCodeName"] != null)
+                Order.coupon_code = Session["couponCodeName"].ToString();
+            else
+                Order.coupon_code = "";
+
+            Order.TotalPrice = Session["grdTotal"].ToString();
+            Order.sale_price = ViewState["salPrice"].ToString();
+            //Order.price = ViewState["Price"].ToString(); 
+            Order.price = Session["grdTotal"].ToString();
+            Order.shipping_price = ViewState["ShippingCharge"].ToString();
+
+            long resultOrder = orderHandler.insert_order(Order);
+            if (resultOrder > 0)
+            {
+                Order.order_id = Convert.ToInt32(resultOrder);
+                Session["OrderNumber"] = Order.order_id;
+
+                DataTable dtCart = (DataTable)Session["Cart"];
+                if (dtCart != null && dtCart.Rows.Count > 0)
+                {
+                    for (int i = 0; i < dtCart.Rows.Count; i++)
+                    {
+                        Order.product_id = Convert.ToInt64(dtCart.Rows[i]["product_id"].ToString());
+                        Order.quantity = Convert.ToInt32(dtCart.Rows[i]["quantity"].ToString());
+                        Order.TotalPrice = dtCart.Rows[i]["Total"].ToString();
+                        //Order.order_status = "Pending for Admin";
+                        Order.order_status = "New Order";
+
+                        bool resultOrderDetails = orderHandler.insert_order_detail(Order);
+                        if (resultOrderDetails)
+                        {
+                            // checking and updating stock and out of stock
+                            product_handler productsHandler = new product_handler();
+                            DataSet dsqty = productsHandler.get_search_quantity(Convert.ToInt64(dtCart.Rows[i]["product_id"].ToString()));
+                            if (dsqty != null && dsqty.Tables.Count > 0)
+                            {
+                                DataTable dtqty = dsqty.Tables[0];
+                                if (dtqty.Rows.Count > 0)
+                                {
+                                    qty = Convert.ToInt32(dtqty.Rows[0]["quantity"].ToString());
+                                    txtqty = Convert.ToInt32(dtCart.Rows[i]["quantity"].ToString());
+                                    qtycount = qty - txtqty;
+                                    Order.quantity = qtycount;
+
+                                    if (qty == 0)
+                                    {
+                                        //pending redirect on product detail page.
+                                    }
+
+                                    if (qtycount <= 0)
+                                    {
+                                        Order.in_stock = false;
+                                    }
+                                    else
+                                    {
+                                        Order.in_stock = true;
+                                    }
+
+                                    bool updateQuantity = orderHandler.update_product_quantity(Order);
+                                }
+                            }
+                        }
+                    }
+                }
+                Session["email"] = Session["CustomerLoginDetails"].ToString();
+                Session["amt"] = lblGrandTotal.Text;
+                Session["cell"] = hfpersonamobile.Value;
+                Session["orderid"] = Session["OrderNumber"].ToString();
+
+                return true;
+            }
+            return false;
+        }
+        #endregion
+
+        //protected void btnUserDetails_Click(object sender, EventArgs e)
+        //{
+        //    if (Session["CustomerLoginDetails"] != null)
+        //    {
+        //        ViewState["steps"] = "2";
+        //        ApplyActiveSteps();
+        //    }
+        //}
+
+        //protected void btnDeliveryAddress_Click(object sender, EventArgs e)
+        //{
+        //    if (!string.IsNullOrEmpty(lblreceiverAddress.Text))
+        //    {
+        //        ViewState["steps"] = "3";
+        //        ApplyActiveSteps();
+        //    }
+        //}
+
+
+
+        #region CCAvenue
+        private void SubmitCcAvenue()
+        {
+            CCACrypto chkSum = new CCACrypto();
+            string requestUrl = "https://secure.ccavenue.com/transaction/transaction.do?command=initiateTransaction";       //Live
+            //string requestUrl = "https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction";       //Testing
+
+            string WorkingKey = "AA66DDF3F895AB3818C39AF133E3473D";//put in the 32bit alpha numeric key in the quotes provided here 	
+            string MerchantId = "162060";
+            string AccessCode = "AVJV77FD61BV39VJVB";
+            string CountryName = "India";
+
+            if (Session["CustomerData"] != null)
+            {
+                StringBuilder ToEncrypt = new StringBuilder();
+                ToEncrypt.Append("tid=" + DateTime.Now.ToString("yyyyMMddHHmmssfff"));
+                ToEncrypt.Append("&merchant_id=" + MerchantId);
+                ToEncrypt.Append("&order_id=" + Session["orderid"]);
+                if (Session["CustomerLoginDetails"].ToString().Equals("kalpesh013@gmail.com") || Session["CustomerLoginDetails"].ToString().Equals("faizan@carbonmedia.in"))
+                    ToEncrypt.Append("&amount=1.00");
+                else
+                    ToEncrypt.Append("&amount=" + lblGrandTotal.Text);
+
+                ToEncrypt.Append("&currency=INR");
+
+                //ToEncrypt.Append("&redirect_url=https://thestruttstore.com/ccavenue/ccavResponseHandler.aspx");
+                //ToEncrypt.Append("&cancel_url=https://thestruttstore.com/ccavenue/ccavResponseHandler.aspx");
+                ToEncrypt.Append("&redirect_url=" + System.Configuration.ConfigurationManager.AppSettings["siteUrl"] + "/success.aspx");
+                ToEncrypt.Append("&cancel_url=" + System.Configuration.ConfigurationManager.AppSettings["siteUrl"] + "/error.aspx");
+
+                ToEncrypt.Append("&billing_name=" + txtreceivername.Text + (string.IsNullOrEmpty(txtreceiverlastname.Text) ? "" : " " + txtreceiverlastname.Text));
+                ToEncrypt.Append("&billing_address=" + txtreceiveraddress.Text + (string.IsNullOrEmpty(txtLandMark.Text) ? "" : ", " + txtLandMark.Text));
+                ToEncrypt.Append("&billing_city=" + ddlReceiverCity.SelectedItem.Text);
+                ToEncrypt.Append("&billing_state=" + ddlReceiverState.SelectedItem.Text);
+                ToEncrypt.Append("&billing_zip=" + txtReceiverPinCode.Text);
+                ToEncrypt.Append("&billing_country=" + CountryName);
+                ToEncrypt.Append("&billing_tel=" + txtreceiverphone.Text);
+                ToEncrypt.Append("&billing_email=" + Session["CustomerLoginDetails"].ToString());
+
+                ToEncrypt.Append("&delivery_name=" + txtreceivername.Text + (string.IsNullOrEmpty(txtreceiverlastname.Text) ? "" : " " + txtreceiverlastname.Text));
+                ToEncrypt.Append("&delivery_address=" + txtreceiveraddress.Text + (string.IsNullOrEmpty(txtLandMark.Text) ? "" : ", " + txtLandMark.Text));
+                ToEncrypt.Append("&delivery_city=" + ddlReceiverCity.SelectedItem.Text);
+                ToEncrypt.Append("&delivery_state=" + ddlReceiverState.SelectedItem.Text);
+                ToEncrypt.Append("&delivery_zip=" + txtReceiverPinCode.Text);
+                ToEncrypt.Append("&delivery_country=" + CountryName);
+                ToEncrypt.Append("&delivery_tel=" + txtreceiverphone.Text);
+                ToEncrypt.Append("&merchant_param1=" + txtreceivermessage.Text);
+
+                string Encrypted;
+                Encrypted = chkSum.Encrypt(ToEncrypt.ToString(), WorkingKey);
+
+                Response.Redirect(requestUrl + "&encRequest=" + Encrypted + "&access_code=" + AccessCode);
+                //Response.Redirect("~/ccavRequestHandler.aspx?request=" + Encrypted + "&access_code=" + AccessCode);
+            }
+        }
+
+        #endregion
+
+        #region Razorpay
+
+        private void RazorpaySubmit()
+        {
+            string key = ConfigurationManager.AppSettings["razorpay_key"];
+            string secret = ConfigurationManager.AppSettings["razorpay_secret"];
+            int totalAmount;
+
+            RazorpayClient client = new RazorpayClient(key, secret);
+
+            if (Session["CustomerData"] != null)
+            {
+                StringBuilder reqStr = new StringBuilder();
+
+                if (Session["CustomerLoginDetails"].ToString().Equals("kalpesh013@gmail.com") || Session["CustomerLoginDetails"].ToString().Equals("faizan@carbonmedia.in"))
+                    totalAmount = 100;
+                else
+                    totalAmount = Convert.ToInt32((Convert.ToSingle(lblGrandTotal.Text) * 100));
+
+                string jsRequest = string.Format(@"<script type=""text/javascript""
+                        src=""https://checkout.razorpay.com/v1/checkout.js""
+                            data-key=""{0}""
+                            data-amount=""{1}""
+                            data-name=""Razorpay""
+                            data-description=""{2}""
+                            data-image=""https://razorpay.com/favicon.png""
+                            data-prefill.name=""{3}""
+                            data-prefill.email=""{4}""
+                            data-prefill.contact=""{5}""></script> ", key, totalAmount, "Payment of OrderID: " + Session["orderid"], 
+                            txtreceivername.Text + (string.IsNullOrEmpty(txtreceiverlastname.Text) ? "" : " " + txtreceiverlastname.Text), 
+                            Session["CustomerLoginDetails"].ToString(), txtreceiverphone.Text);
+
+                litRazor.Text = jsRequest;
+            }
+        }
+
+        #endregion
+        //protected void btnFbGoogle_Click(object sender, EventArgs e)
+        //{
+        //    //security scty = new security();
+        //    customer_handler customerHandler = new customer_handler();
+        //    BusinessEntities.customer customer = new BusinessEntities.customer();
+
+        //    customer.customer_name = hfpersonaName.Value;
+        //    if (string.IsNullOrEmpty(hfreceiveremail.Value))
+        //        customer.email_id = hffbid.Value;
+        //    else
+        //        customer.email_id = hfreceiveremail.Value;
+
+        //    DataSet ds = customerHandler.check_guest_loginid(customer.email_id);
+        //    bool result = false;
+        //    if (ds != null && ds.Tables.Count > 0)
+        //    {
+        //        DataTable dt = ds.Tables[0];
+        //        if (dt.Rows.Count > 0)
+        //        {
+        //            customer.customer_id = Guid.Parse(dt.Rows[0]["customer_id"].ToString());
+
+        //            Session["CustomerLoginDetails"] = customer.email_id;
+        //            Session["customerDetailsId"] = customer.customer_id.ToString();
+        //            bindDeliveryDetails(Session["CustomerLoginDetails"].ToString());
+        //            BillingDetails();
+        //        }
+        //        else
+        //        {
+        //            Guid customer_id = Guid.NewGuid();
+        //            customer.customer_id = customer_id;
+
+        //            if (hfLoginType.Value.Equals("fb"))
+        //                result = customerHandler.insert_update_facebook_customer(customer, ref customer_id);
+        //            else if (hfLoginType.Value.Equals("google"))
+        //                result = customerHandler.insert_update_google_customer(customer, ref customer_id);
+
+        //            if (result)
+        //            {
+        //                Session["CustomerLoginDetails"] = customer.email_id;
+        //                Session["customerDetailsId"] = customer_id.ToString();
+
+        //                bindDeliveryDetails(Session["CustomerLoginDetails"].ToString());
+        //                BillingDetails();
+        //            }
+        //        }
+        //    }
+        //}
+
+        private void SetActiveSteps()
+        {
+            if (Session["CustomerLoginDetails"] == null || string.IsNullOrEmpty(txtreceiverphone.Text))
+            {
+                ViewState["steps"] = "1";
+            }
+            else
+            {
+                ViewState["steps"] = "2";
+            }
+
+            ApplyActiveSteps();
+        }
+
+        private void ApplyActiveSteps()
+        {
+
+            if (Convert.ToString(ViewState["steps"]) == "1")          //User Details
+            {
+                head1UserDetails.Attributes.Add("class", "h6 heading heading-user active");
+                head3Payment.Attributes.Add("class", "h6 heading heading-user");
+
+                panel1UserDetails.Attributes.Add("class", "padding-25 fragment active");
+                // panel2DeliveryAdd.Attributes.Add("class", "padding-25 fragment");
+                panel3Payment.Attributes.Add("class", "padding-25 fragment");
+
+                btnChangeUserDetails.Visible = false;
+                //btnChangeDeliveryAdd.Visible = false;
+                //if (string.IsNullOrEmpty(lblreceiverAddress.Text))
+                //    btnUseAddress2.Visible = false;
+                //else
+                //    btnUseAddress2.Visible = true;
+
+
+            }
+
+            else if (ViewState["steps"].ToString() == "2")     //Payment Methods
+            {
+                head1UserDetails.Attributes.Add("class", "h6 heading heading-user");
+                head3Payment.Attributes.Add("class", "h6 heading heading-user active");
+
+                panel1UserDetails.Attributes.Add("class", "padding-25 fragment");
+                panel3Payment.Attributes.Add("class", "padding-25 fragment active");
+
+                btnChangeUserDetails.Visible = true;
+                // btnChangeDeliveryAdd.Visible = true;
+
+                //RazorpaySubmit();
+
+                //RazorpayLoadData();
+                RazorpaySubmit();
+            }
+        }
+
+        protected void btnChangeUserDetails_Click(object sender, EventArgs e)
+        {
+            ViewState["steps"] = "1";
+            ApplyActiveSteps();
+        }
+
+        protected void txtguestemail_OnTextChanged(object sender, EventArgs e)
+        {
+            insertTempCart();
+        }
+
+        private void insertTempCart()
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(txtguestemail.Text) || !retxtguestemail.IsValid)
+                    return;
+
+                string city = string.Empty, state = string.Empty, name = string.Empty;
+                if (ddlReceiverCity.SelectedIndex > 0) city = ddlReceiverCity.SelectedItem.Text;
+                if (ddlReceiverState.SelectedIndex > 0) state = ddlReceiverState.SelectedItem.Text;
+                if (string.IsNullOrEmpty(txtreceiverlastname.Text))
+                    name = txtreceivername.Text;
+                else
+                    name = txtreceivername.Text + " " + txtreceiverlastname.Text;
+
+                temp_cart_handler cartHandler = new temp_cart_handler();
+                int temp_customer_Id = cartHandler.insert_temp_customer(txtguestemail.Text, name, txtreceiverphone.Text, txtreceiveraddress.Text, txtLandMark.Text, city, state, "India", txtReceiverPinCode.Text, false);
+
+                DataTable dtCart = (DataTable)Session["Cart"];
+                if (dtCart != null && dtCart.Rows.Count > 0)
+                {
+                    for (int i = 0; i < dtCart.Rows.Count; i++)
+                    {
+                        cartHandler.insert_temp_cart(temp_customer_Id, Convert.ToInt64(dtCart.Rows[i]["product_id"]), Convert.ToInt32(dtCart.Rows[i]["quantity"]));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return;
+            }
+        }
+
+        private void updateTempCart()
+        {
+            try
+            {
+                string city = string.Empty, state = string.Empty, name = string.Empty;
+                if (ddlReceiverCity.SelectedIndex > 0) city = ddlReceiverCity.SelectedItem.Text;
+                if (ddlReceiverState.SelectedIndex > 0) state = ddlReceiverState.SelectedItem.Text;
+                if (string.IsNullOrEmpty(txtreceiverlastname.Text))
+                    name = txtreceivername.Text;
+                else
+                    name = txtreceivername.Text + " " + txtreceiverlastname.Text;
+
+                temp_cart_handler cartHandler = new temp_cart_handler();
+                int temp_customer_Id = cartHandler.update_temp_customer(txtguestemail.Text, name, txtreceiverphone.Text, txtreceiveraddress.Text, txtLandMark.Text, city, state, "India", txtReceiverPinCode.Text);
+
+            }
+            catch (Exception ex)
+            {
+                return;
+            }
+        }
+
+        private void deleteTempCart()
+        {
+            temp_cart_handler cartHandler = new temp_cart_handler();
+            cartHandler.delete_temp_cart_customer(txtguestemail.Text);
+        }
+
+        //protected void btnUseAddress2_Click(object sender, EventArgs e)
+        //{
+        //    ViewState["steps"] = "2";
+        //    ApplyActiveSteps();
+        //}
+
+        //private void GenerateOTPCode()
+        //{
+        //    Random r = new Random();
+        //    string OTP = r.Next(10000, 99999).ToString();
+
+        //    //Send message of OTP
+        //    Utility.SendSmsCodOtpSend(txtreceiverphone.Text, txtreceivername.Text, OTP);
+
+        //    lblotpno.Text = "OTP sent to your mobile, Please enter here to complete order.";
+        //    ViewState["OTP"] = OTP;
+
+        //}
+
+
+    }
+}

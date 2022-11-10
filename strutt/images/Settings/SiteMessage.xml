@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Message>
+	<MessageNode>
+		<key>msgAdminLogging</key>
+		<msg>Sorry,Username or password incorrect.</msg>
+	</MessageNode>
+	<MessageNode>
+		<key>msgSavedSuccessfully</key>
+		<msg>has been submited successfully.</msg>
+	</MessageNode>
+	<MessageNode>
+		<key>msgUpdatedSuccessfully</key>
+		<msg>has been updated successfully.</msg>
+	</MessageNode>
+	<MessageNode>
+		<key>msgDeleteSuccessfully</key>
+		<msg>has been deleted successfully.</msg>
+	</MessageNode>
+	<MessageNode>
+		<key>msgAlreadyExist</key>
+		<msg>already exist.</msg>
+	</MessageNode>
+	<MessageNode>
+		<key>msgRecordsList</key>
+		<msg>Total: [num] records</msg>
+	</MessageNode>
+</Message>

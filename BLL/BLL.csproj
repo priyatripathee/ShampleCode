@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{062824F8-E9F3-4B18-AD14-62309574E0B6}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>BLL</RootNamespace>
+    <AssemblyName>BLL</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="admin_data_handler.cs" />
+    <Compile Include="banner_handler.cs.cs" />
+    <Compile Include="blog_handler.cs" />
+    <Compile Include="category_handler.cs" />
+    <Compile Include="city_handler.cs" />
+    <Compile Include="customerreview_handler.cs" />
+    <Compile Include="customer_handler.cs" />
+    <Compile Include="dashboard_handler.cs" />
+    <Compile Include="feedback_data_handler.cs" />
+    <Compile Include="Helpers.cs" />
+    <Compile Include="leave_feedback_handler.cs" />
+    <Compile Include="menu_handler.cs" />
+    <Compile Include="newsletter_handler.cs" />
+    <Compile Include="order_handler.cs" />
+    <Compile Include="pagelabel_handler.cs" />
+    <Compile Include="permission_handler.cs" />
+    <Compile Include="pincode_handler.cs" />
+    <Compile Include="product_handler.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="receiver_address_handler.cs" />
+    <Compile Include="review_handler.cs" />
+    <Compile Include="temp_cart_handler.cs" />
+    <Compile Include="tools_handler.cs" />
+    <Compile Include="Utility.cs" />
+    <Compile Include="wishlist_handler.cs.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BusinessEntities\BusinessEntities.csproj">
+      <Project>{D94106F0-390B-460F-843A-C963AD0752B3}</Project>
+      <Name>BusinessEntities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DAL\DAL.csproj">
+      <Project>{C325C6DB-C1B4-455C-B1EE-810897312CC9}</Project>
+      <Name>DAL</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

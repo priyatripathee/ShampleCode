@@ -1,0 +1,214 @@
+﻿using BLL;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+
+namespace strutt.Admin
+{
+    public partial class ScheduleEmail : System.Web.UI.Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if (!IsPostBack)
+            {
+                if (JobRunNotifyEmail())
+                {
+                    this.SendAbandonedcartemail();
+                }
+
+
+            }
+        }
+        #region Abandoned cart and failed payment email 
+        public bool SendAbandonedcartemail()
+        {
+            try
+            {
+
+
+
+                string msgbody = "";
+                string emailsubject = "";
+                string imgThumb, ProductUrl;
+
+                order_handler orderHandler = new order_handler();
+                DataSet ds = new DataSet();
+
+                ds = orderHandler.get_abandonedcart();
+                if (ds != null && ds.Tables[0].Rows.Count > 0)
+                {
+                    DataTable dt = ds.Tables[0];
+
+                    ViewState["order_id"] = dt.Rows[0]["order_id"];
+                    ViewState["ContactNumber"] = dt.Rows[0]["contact_number"].ToString();
+                    ViewState["Sendemail_count"] = dt.Rows[0]["Sendemail_count"].ToString();
+                    ViewState["email_id"] = dt.Rows[0]["email_id"].ToString();
+
+
+                    if (Convert.ToInt64(ViewState["Sendemail_count"]) == 4 || Convert.ToInt64(ViewState["Sendemail_count"]) == 5)
+                    {
+                        msgbody = @"<tr><td valign='top' style='padding:40px; margin:0px;'>
+                         <p style='font-family:Arial, Helvetica, sans-serif; font-size:16px;'>Hey " + dt.Rows[0]["name"].ToString() + @",</p>
+                            <p style='font-family:Arial, Helvetica, sans-serif; font-size:16px;'>
+                           </p>
+                         <p style='font-family:Arial, Helvetica, sans-serif; font-size:16px;'>Forget something? We noticed you left something behind. Need not to worry. We saved the items in your cart so you can easily complete your purchase.
+                           </p>
+                        </td></tr>
+                      <tr>
+                        <td valign='top' style='padding:0px 113px; margin:0px;'>
+                        <table width='100%' border='0'>
+						</tr>
+                      <tr>
+                       <td valign='top' style='padding:20px; margin:35px;background-color:#007eff94;float:left;font-size:15px;font-weight:bold'>Items in your cart</td>
+                        </tr>
+                        <tr>
+                    <td>
+                      <hr>
+                    </td>
+                    </tr>
+					<tr>
+                        <td valign='top' style='padding:20px; margin:35px;float:left;font-size:15px;'>Complete your purchase </td>
+                    </tr>";
+                    }
+                    if (Convert.ToInt64(ViewState["Sendemail_count"]) == 6 || Convert.ToInt64(ViewState["Sendemail_count"]) == 7 || Convert.ToInt64(ViewState["Sendemail_count"]) == 8)
+                    {
+                        msgbody = @"<tr><td valign='top' style='padding:40px; margin:0px;'>
+                         <p style='font-family:Arial, Helvetica, sans-serif; font-size:16px;'>" + dt.Rows[0]["name"].ToString() + @"</p>
+                            <p style='font-family:Arial, Helvetica, sans-serif; font-size:16px;'>
+                           </p>
+                         <p style='font-family:Arial, Helvetica, sans-serif; font-size:16px;'>Don't worry, we got your back.
+Your current payment method could not be processed and the amount was not deducted. You can try again or try a different payment method. 
+We reserved your items for you for the next few minutes and look forward to confirming your order and sending them off to you soon.
+We look forward to you becoming a part of the STRUTT family. 
+                           </p>
+                        </td></tr>
+                      <tr>
+                        <td valign='top' style='padding:0px 113px; margin:0px;'>
+                        <table width='100%' border='0'>
+						</tr>
+                       <tr>
+                       <td valign='top' style='padding:20px; margin:35px;background-color:#007eff94;float:left;font-size:15px;font-weight:bold'>Items in your cart</td>
+                        </tr>
+                        <tr>
+                    <td>
+                      <hr>
+                    </td>
+                    </tr>
+					<tr>
+                        <td valign='top' style='padding:20px; margin:35px;float:left;font-size:15px;'>Complete your purchase </td>
+                    </tr>";
+                    }
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
+
+                        ProductUrl = System.Configuration.ConfigurationManager.AppSettings["siteUrl"] + @"/productdetails.aspx?proid=" + dt.Rows[i]["product_id"].ToString();
+                        double ItemAmount = Convert.ToDouble(dt.Rows[i]["quantity"]) * Convert.ToDouble(dt.Rows[i]["sale_price"]);
+                        imgThumb = System.Configuration.ConfigurationManager.AppSettings["siteUrl"] + "/images/Product/Thumb/" + dt.Rows[i]["thumb_image"].ToString().Replace(" ", "%20");
+                        ProductUrl = System.Configuration.ConfigurationManager.AppSettings["siteUrl"] + @"/productdetails.aspx?proid=" + dt.Rows[i]["product_id"].ToString();
+
+                        msgbody += @"<tr>
+                            <td width='17%'><img style='height:90px;' src='" + imgThumb + @"'/></td>
+                            <td width='50%' style='font-family:Arial, Helvetica, sans-serif; font-size:15px; text-align:center'><a target='_blank' style='color:#FB641B' href='" + ProductUrl + "'>" + dt.Rows[i]["product_name"].ToString() + @"</a></td>
+                            <td width='13%'  style='font-family:Arial, Helvetica, sans-serif; font-size:15px; text-align:center'>" + dt.Rows[i]["quantity"].ToString() + @"</td>
+                            <td width='18%'  style='font-family:Arial, Helvetica, sans-serif; font-size:15px; text-align:right'>Rs. " + ItemAmount.ToString("0.00") + @"</td>
+                    </tr>";
+
+
+
+                    }
+
+                    if (Convert.ToInt64(ViewState["Sendemail_count"]) == 4 || Convert.ToInt64(ViewState["Sendemail_count"]) == 5)
+                    {
+                        emailsubject = "Finch, your cart is wondering where you went!";
+                        bool emailsent = DAL.Utility.sendEmail(emailsubject, msgbody, null, null, (ViewState["email_id"].ToString()), null);
+                        if (emailsent)
+                        {
+                            orderHandler.update_temp_customer_email_count(Convert.ToInt32((ViewState["order_id"])), Convert.ToInt64(ViewState["Sendemail_count"]));
+                        }
+                    }
+                    if (Convert.ToInt64(ViewState["Sendemail_count"]) == 6 || Convert.ToInt64(ViewState["Sendemail_count"]) == 7 || Convert.ToInt64(ViewState["Sendemail_count"]) == 8)
+                    {
+                        emailsubject = "Your Payment attempt did not go through";
+                        bool emailsent = DAL.Utility.sendEmail(emailsubject, msgbody, null, null, (ViewState["email_id"].ToString()), null);
+                        if (emailsent)
+                        {
+                            orderHandler.update_temp_customer_email_count(Convert.ToInt32((ViewState["order_id"])), Convert.ToInt64(ViewState["Sendemail_count"]));
+
+                        }
+                    }
+
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Response.Write("Error: Cart Email Sent: " + ex.Message);
+                return false;
+            }
+        }
+        #endregion
+
+
+        public bool JobRunNotifyEmail()
+        {
+            try
+            {
+                order_handler orderHandler = new order_handler();
+                DataSet ds = new DataSet();
+                int cartcount = 0;
+                int paymentfailcount = 0;
+                DateTime CurrentDate;
+                CurrentDate = DateTime.Now;
+                ds = orderHandler.get_abandonedcart();
+                if (ds != null && ds.Tables[0].Rows.Count > 0)
+                {
+                    DataTable dt = ds.Tables[0];
+
+                    var cartrow = from row in dt.AsEnumerable()
+                                  where row.Field<string>("customer_medium") == "Cart Abandoned"
+                                  select row;
+
+                    var paymentfailrow = from row in dt.AsEnumerable()
+                                         where row.Field<string>("customer_medium") == "Failed Payment"
+                                         select row;
+
+                    cartcount = cartrow.Count<DataRow>();
+
+                    paymentfailcount = paymentfailrow.Count<DataRow>();
+
+
+                    string msgbody = @"<tr><td>
+                <table border='0' cellpadding='0' cellspacing='0' style='width: 86%;'>
+          <td valign='top' style='padding:40px; margin:0px;'>
+            <p style='font-family:Arial, Helvetica, sans-serif; font-size:16px;'>Hi,</p>
+            <p style='font-family:Arial, Helvetica, sans-serif; font-size:16px;'>The Strutt- Scheduler Run successfully.</p>
+                <tr><td></td>
+                <td></td>
+                <td>" + "Scheduler Run Time: " + CurrentDate + @"</td>
+                <td></td>
+                <td>" + "Cart Abandoned Customer Count: " + cartcount + @"</td>
+                <td></td>
+                <td>" + "Failed Payment Customer Count: " + paymentfailcount + @"</td>
+                <td></td>
+                </tr>
+                </table></td></tr>
+                <tr><td></td></tr></table></td></tr>
+                </table>
+                </td></tr>";
+
+                    bool emailsent = DAL.Utility.sendEmail("Email Send Scheduler Run successfully!", msgbody, null, null, "kalpesh013@gmail.com", "he2_ptl@yahoo.com");
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Response.Write("Error: Scheduler Run: " + ex.Message);
+                return false;
+            }
+        }
+    }
+}

@@ -1,0 +1,41 @@
+﻿body{
+	font-family: 'Open Sans',sans-serif;
+}
+
+.fbAlbum {
+	position:relative;
+	width:175px;
+	height:220px;
+	cursor:default; float:left; margin:0px 0px 10px 10px; border:1px solid #ccc; 
+}
+.fbAlbum .name{font-size:12px; text-align:center; z-index:999; position:relative; top:200px; height:19px; background:#CCC;}
+.fbAlbum .name a{font-size:12px; text-align:center; z-index:999; position:relative; top:0px; height:19px; background:#CCC; text-decoration:none; color:#302C2E;}
+
+.fbAlbum IMG {
+	position:absolute;
+	top:0;
+	left:0;
+	z-index:8;
+	width:155px;
+	height:180px; margin:10px 10px 0px 10px; background:#fff;
+}
+
+
+.fbAlbum IMG.active {
+	z-index:10;
+}
+
+.fbAlbum IMG.last-active {
+	z-index:9;
+}
+			
+.products{
+	width:175px;
+	height:220px;
+	cursor:default; float:left; margin:0px 0px 10px 10px; border:1px solid #ccc; text-align:center; font-size:12px; }
+.products img{	
+	width:155px;
+	height:180px; margin:10px 10px 10px 10px; background:#fff;
+}
+.products span{ width:175px; font-size:12px; border-top:1px solid #ccc; display:block;}
+.products a{color:#999; text-decoration:none;}

@@ -1,0 +1,309 @@
+﻿/*-----------------------Newsletter Inside Design CSS-------------------------*/
+
+<style>
+
+#backgroundPopup{ display:none; position:fixed; _position:absolute; /* hack for internet explorer 6*/ height:100%; width:100%; top:0; left:0; background-color: transparent;       background:rgba(0, 0, 0, 0.5);z-index:999; }
+
+#popupContact{ display:none; position:fixed; _position:absolute; /* hack for internet explorer 6*/ height:350px; width:500px; background:#FFFFFF; border:4px solid #ddd; z-index:999; padding:8px; font-size:13px; }
+
+#popupContactClose{    background:url(http://3.bp.blogspot.com/-V2A37T0PQ24/U3IuYpfg4DI/AAAAAAAAC_8/YzHEp7rFzSc/s1600/close.PNG) no-repeat;    width:25px;    height:29px;    display:inline;    z-index:3200;    position:absolute;    top:-15px;    right:-16px;    cursor:pointer;    text-indent: -99999px;}
+
+#description {    color: #AAAAAA;    font-family: times New Roman;    font-size: 19px;    font-style: italic;    line-height:30px; }
+
+#description img {    float: left;    height: 80px;    padding: 0 25px 0 10px;    width: 80px; }
+
+#btntfollowForm {  padding: 45px; }
+
+#btntfollowForm img {  border:none; }
+
+#btntfollowForm p {  margin: 0 0 10px;}
+
+#btntfollowForm input:not([type="checkbox"]){ width: 93%; margin-top: 10px; padding: 10px 5px 10px 25px;  border: 1px solid rgb(178, 178, 178); -webkit-appearance: textfield; -webkit-box-sizing: content-box;   -moz-box-sizing : content-box;       box-sizing : content-box; -webkit-border-radius: 3px;    -moz-border-radius: 3px;         border-radius: 3px; -webkit-box-shadow: 0px 1px 4px 0px rgba(168, 168, 168, 0.6) inset;    -moz-box-shadow: 0px 1px 4px 0px rgba(168, 168, 168, 0.6) inset;         box-shadow: 0px 1px 4px 0px rgba(168, 168, 168, 0.6) inset; -webkit-transition: all 0.2s linear;    -moz-transition: all 0.2s linear;      -o-transition: all 0.2s linear;   transition: all 0.2s linear; }
+
+#btntfollowForm input:not([type="checkbox"]):active,
+
+#btntfollowForm input:not([type="checkbox"]):focus{ border: 1px solid rgba(91, 90, 90, 0.7); background: rgba(238, 236, 240, 0.2); -webkit-box-shadow: 0px 1px 4px 0px rgba(168, 168, 168, 0.9) inset;    -moz-box-shadow: 0px 1px 4px 0px rgba(168, 168, 168, 0.9) inset;         box-shadow: 0px 1px 4px 0px rgba(168, 168, 168, 0.9) inset;} 
+
+#btntfollowForm .button input{    background: none repeat scroll 0 0 #fd638f ;      border-radius: 3px 3px 3px 3px;     color: #FFFFFF;    cursor: pointer;    font-family: 'Arial Narrow',Arial,sans-serif;    font-size: 24px;    margin-bottom: 10px;    padding: 8px 5px;     width: 30%;    float: right; }
+
+#btntfollowForm .button input:hover{    background: #fd638f; text-decoration: none; }
+
+#btntfollowForm .button input:active,
+
+#btntfollowForm .button input:focus{ background: #fd638f; position: relative; top: 1px; }
+
+.btntFollowFooter {  color:#222;  text-align: center;    font: 10px Tahoma, Helvetica, Arial, Sans-Serif;    padding: 7px 0;    margin-top: 80px;    text-shadow: 0px 2px 3px #555;    position: absolute;    width: 500px; }
+
+.btntFollowFooter a {    color: #222;    text-decoration: none; }
+
+.btntFollowFooter a:hover {    color: #fff; }
+
+<!--[if lt IE 7]>
+
+#btnt-container a.btntCloseImg {    background:none;    right:-14px;    width:22px;    height:26px;     filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='http://3.bp.blogspot.com/-V2A37T0PQ24/U3IuYpfg4DI/AAAAAAAAC_8/YzHEp7rFzSc/s1600/close.PNG',sizingMethod='scale'); }
+
+#btntfollowForm  input{ padding: 10px 5px 10px 32px;    width: 93%; }
+
+#btntfollowForm  input[type=checkbox]{ width: 10px; padding: 0;}
+
+<![endif]-->
+
+</style>
+
+/*-----------------------Newsletter Inside Design CSS-------------------------*/
+
+
+/*-----------------------Newsletter Outside Design CSS-------------------------*/
+
+<style id='page-skin-1' type='text/css'>        
+
+.Subscribe
+{
+    padding: 1px; width:525px !important;height:300px !important;background-color:#fff;
+}
+        #subscribe_popup, .overlays
+        {
+            font: 12px/1.2 Arial,Helvetica,san-serif;
+            background: #fff !important;
+            -moz-border-radius: 3px;
+            -webkit-border-radius: 3px;
+            border-radius: 3px;
+            padding: 1px; width:525px !important;height:300px !important;background-color:#fff;
+            margin-bottom:20px !important;
+            
+        }
+        #subscribe_popup, .overlays a, #subscribe_popup, .overlays a:hover, #subscribe_popup, .overlays a:visited
+        {
+            text-decoration: none;
+        }
+        
+        a.sub
+        {
+            background: url("../images/subscribe-button.png") no-repeat scroll 0 0 transparent;
+            color: #963;
+            display: block;
+            height: 44px;
+            line-height: 29px;
+            text-indent: -999em;
+            width: 130px;
+            margin: 0 auto;
+        }
+        .box-side h4 a:hover
+        {
+            color: #f26535;
+        }
+        #box-or
+        {
+            background: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            height: 25px;
+            line-height: 25px;
+            position: absolute;
+            width: 20px;
+            margin: -115px 0 0 257px;
+        }
+
+        /*
+ColorBox Core Style:
+The following CSS is consistent between example themes and should not be altered.
+*/
+        #colorbox, #cboxOverlay, #cboxWrapper
+        {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 9999;
+            overflow: visible;
+        }
+        #cboxOverlay
+        {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+        }
+        #cboxMiddleLeft, #cboxBottomLeft
+        {
+            clear: left;
+        }
+        #cboxContent
+        {
+            position: relative;
+        }
+        #cboxLoadedContent
+        {
+            overflow: auto;
+        }
+        #cboxTitle
+        {
+            margin: 0;
+        }
+        #cboxLoadingOverlay, #cboxLoadingGraphic
+        {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+        }
+        #cboxPrevious, #cboxNext, #cboxClose, #cboxSlideshow
+        {
+            cursor: pointer;
+        }
+        .cboxPhoto
+        {
+            float: left;
+            margin: auto;
+            border: 0;
+            display: block;
+        }
+        .cboxIframe
+        {
+            width: 100%;
+            height: 100%;
+            display: block;
+            border: 0;
+        }
+        /*
+User Style:
+Change the following styles to modify the appearance of ColorBox.  They are
+ordered & tabbed in a way that represents the nesting of the generated HTML.
+*/
+        #cboxOverlay
+        {
+            background: #000;
+            opacity: 0.3 !important;
+            
+        }
+        #colorbox
+        {
+            background-color: #fd638f !important;
+            -moz-border-radius: 5px;
+            -webkit-border-radius: 5px;
+            border-radius: 5px;
+            width:542px !important;
+            height:315px !important;
+            position:fixed;
+    
+        }
+        #cboxTopLeft
+        {
+            width: 0px;
+            height: 0px;
+        }
+        #cboxTopCenter
+        {
+            height: 8px;
+        }
+        #cboxTopRight
+        {
+            width: 0px;
+            height: 0px;
+        }
+        #cboxBottomLeft
+        {
+            width: 0px;
+            height: 0px;
+        }
+        #cboxBottomCenter
+        {
+            height: 0px;
+        }
+        #cboxBottomRight
+        {
+            width: 0px;
+            height: 0px;
+        }
+        #cboxMiddleLeft
+        {
+            width: 8px;
+        }
+        #cboxMiddleRight
+        {
+            width: 0px;
+        }
+        #cboxContent
+        {
+            overflow: visible;
+        }
+        #cboxLoadedContent
+        {
+            margin-bottom: 5px;
+        }
+
+        #cboxTitle
+        {
+            position: absolute;
+            bottom: -25px;
+            left: 0;
+            text-align: center;
+            width: 100%;
+            font-weight: bold;
+            color: #7C7C7C;
+        }
+        #cboxCurrent
+        {
+            position: absolute;
+            bottom: -25px;
+            left: 58px;
+            font-weight: bold;
+            color: #7C7C7C;
+        }
+        #cboxPrevious, #cboxNext, #cboxClose, #cboxSlideshow
+        {
+            position: absolute;
+            bottom: -29px;
+            background: url(http://shoptosurprise.com/images/close.png) no-repeat;
+            
+            width: 30px;
+            height: 30px;
+            text-indent: -9999px;
+        }
+        #cboxPrevious
+        {
+            left: 0px;
+            background-position: -51px -25px;
+        }
+        #cboxPrevious.hover
+        {
+            background-position: -51px 0px;
+        }
+        #cboxNext
+        {
+            left: 27px;
+            background-position: -75px -25px;
+        }
+        #cboxNext.hover
+        {
+            background-position: -75px 0px;
+        }
+        #cboxClose
+        {
+            right: 60px;
+            top: 5px;
+            /*background-position: -100px -25px;*/
+        }
+        #cboxClose.hover
+        {
+            /*background-position: -100px 0px;*/
+        }
+        .cboxSlideshow_on #cboxSlideshow
+        {
+            background-position: -125px 0px;
+            right: 27px;
+        }
+        .cboxSlideshow_on #cboxSlideshow.hover
+        {
+            background-position: -150px 0px;
+        }
+        .cboxSlideshow_off #cboxSlideshow
+        {
+            background-position: -150px -25px;
+            right: 27px;
+        }
+        .cboxSlideshow_off #cboxSlideshow.hover
+        {
+            background-position: -125px 0px;
+        }
+    </style>
+
+/*-----------------------Newsletter Outside Design CSS-------------------------*/

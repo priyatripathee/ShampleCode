@@ -1,0 +1,789 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="main.master.cs" Inherits="strutt.master.main" %>
+
+<%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="cc1" %>
+<%@ Register Src="~/uc/uc-autosearch.ascx" TagName="ucautosearch" TagPrefix="ucautosearch" %>
+
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head id="Head1" runat="server">
+    <%-- <meta charset="utf-8" />--%>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="google-site-verification" content="NdGYBoaVysvJyeSLxvbpwfWiraTxlMf43eTQdXyu7w8" />
+    <%--for FB and google--%>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <meta name="google-signin-client_id" content="299776664174-93q3859fbfvqv6eis18hsuuu834e0ln8.apps.googleusercontent.com">
+    <meta name="google-signin-scope" content="https://www.googleapis.com/auth/analytics.readonly">
+    <%--for FB and google--%>
+    <title>The Strutt Store</title>
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/png" href="../img/favicon.ico" />
+    <!-- Bootstrap Css -->
+    <link href="../assets/css/vendor/bootstrap.min.css" rel="stylesheet" />
+    <!-- Icons Css -->
+    <link href="../assets/css/vendor/linearicons.min.css" rel="stylesheet" />
+    <link href="../assets/css/vendor/fontawesome-all.min.css" rel="stylesheet" />
+    <!-- Animation Css -->
+    <link href="../assets/css/plugins/animation.min.css" rel="stylesheet" />
+    <!-- Slick Slier Css -->
+    <link href="../assets/css/plugins/slick.min.css" rel="stylesheet" />
+    <!-- Magnific Popup CSS -->
+    <link href="../assets/css/plugins/magnific-popup.css" rel="stylesheet" />
+    <!-- Easyzoom CSS -->
+    <link href="../assets/css/plugins/easyzoom.css" rel="stylesheet" />
+    <!-- Vendor & Plugins CSS (Please remove the comment from below vendor.min.css & plugins.min.css for better website load performance and remove css files from avobe) -->
+    <%-- <link href="../assets/css/vendor/vendor.min.css" rel="stylesheet" />
+    <link href="../assets/css/plugins/plugins.css" rel="stylesheet" />--%>
+    <!-- Main Style CSS -->
+    <link href="../assets/css/style.css" rel="stylesheet" />
+    <link href="../assets/css/starability-all.min.css" rel="stylesheet" />
+    <link href="../assets/css/cust_new29621.css" rel="stylesheet" />
+
+
+
+    <!-- Google Tag Manager -->
+    <script type="text/javascript">(function (w, d, s, l, i) {
+    w[l] = w[l] || []; w[l].push({
+        'gtm.start':
+            new Date().getTime(), event: 'gtm.js'
+    }); var f = d.getElementsByTagName(s)[0],
+    j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+    'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+})(window, document, 'script', 'dataLayer', 'GTM-MRRB3ZZ');</script>
+    <!-- End Google Tag Manager -->
+    <!-- Facebook Pixel Code -->
+     <script type="text/javascript">
+         !function (f, b, e, v, n, t, s) {
+             if (f.fbq) return; n = f.fbq = function () {
+                 n.callMethod ?
+                 n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+             };
+             if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0';
+             n.queue = []; t = b.createElement(e); t.async = !0;
+             t.src = v; s = b.getElementsByTagName(e)[0];
+             s.parentNode.insertBefore(t, s)
+         }(window, document, 'script',
+         'https://connect.facebook.net/en_US/fbevents.js');
+         fbq('init', '292896398414200');
+         fbq('track', 'PageView');
+    </script>
+   
+    <noscript>
+        <img height="1" width="1" style="display: none" src="https://www.facebook.com/tr?id=292896398414200&ev=PageView&noscript=1" />
+    </noscript>
+    <!-- End Facebook Pixel Code -->
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-827193669" type="text/javascript"></script>
+    <script type="text/javascript">
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'UA-110991640-1');
+        gtag('config', 'AW-827193669');
+    </script>
+    <script type="text/javascript">
+        window.renderBadge = function () {
+            var ratingBadgeContainer = document.createElement("div");
+            document.body.appendChild(ratingBadgeContainer);
+            window.gapi.load('ratingbadge', function () {
+                window.gapi.ratingbadge.render(ratingBadgeContainer, {
+                    "merchant_id": 119671648,
+                    "position": "BOTTOM_RIGHT"
+                });
+            });
+        }
+        window.___gcfg = {
+            lang: 'en_US'
+        };
+    </script>
+    <%-- start: Wigzo Integration script Added by Hetal Patel on 25-07-2020--%>
+    <script type="text/javascript">
+        (function (w, i, g, z, o) {
+            var a, m; w['WigzoObject'] = o; w[o] = w[o] || function () {
+                (w[o].q = w[o].q || []).push(arguments)
+            }, w[o].l = 1 * new Date(); w[o].h = z; a = i.createElement(g),
+            m = i.getElementsByTagName(g)[0]; a.async = 1; a.src = z; m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', '//app.wigzo.com/wigzo.compressed.js', 'wigzo');
+        wigzo('configure', 'b-0-nzLWTtOhipZg2nl3zg');
+    </script>
+    <%-- end: Wigzo Integration script Added by Hetal Patel on 25-07-2020--%>
+    <!-- jQuery JS -->
+        <script src="../../assets/js/vendor/jquery-3.3.1.min.js" type="text/javascript"></script>
+    
+
+
+    <link rel="stylesheet" href="../css/font-awesome.min.css" type="text/css" media="all" />
+<link rel="stylesheet" href="../css/font-stroke.min.css" type="text/css" media="all" />
+
+<link rel="stylesheet" href="../css/js_composer.min.css" type="text/css" media="all" />
+    <link href="../fonts/font_style.css" rel="stylesheet" />
+
+
+    <asp:ContentPlaceHolder ID="head" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body class="page-template-default page page-id-3812 theme-gecko woocommerce-no-js yith-wcan-free has-btn-sticky jan-atc-behavior-popup wpb-js-composer js-comp-ver-6.5.0 vc_responsive">
+    <!-- Google Tag Manager (noscript) -->
+    <noscript>
+        <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MRRB3ZZ"
+            height="0" width="0" style="display: none; visibility: hidden"></iframe>
+    </noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    <form id="form1" runat="server">
+        <asp:ScriptManager ID="smanager" runat="server">
+        </asp:ScriptManager>
+        <div id="jas-wrapper">
+            <header id="jas-header" class="header-3"  role="banner" itemscope="itemscope" itemtype="http://schema.org/WPHeader" >
+    <div class="header__top bgbl pl__15 pr__15">
+      <div class="jas-row middle-xs">
+        <div class="jas-col-md-3 jas-col-sm-6 jas-col-xs-12 flex start-md start-sm center-xs social-logo">
+          <div class="jas-socials">
+              
+              <a class="dib br__50 tc" href="https://www.facebook.com/struttstore/" target="_blank">
+                  <img src="../../images/social/fb_logo.png" />
+              </a>
+              <a class="dib br__50 tc" href="https://twitter.com/thestruttstore" target="_blank">
+                  <img src="../../images/social/twitter_logo.png" />
+              </a>
+              <a class="dib br__50 tc" href="https://www.instagram.com/thestruttstore/" target="_blank">
+                  <img src="../../images/social/insta_logo.png" />
+              </a>
+
+              <a class="dib br__50 tc" href="https://in.linkedin.com/company/the-strutt-store" target="_blank">
+                  <img src="../../images/social/Linkedin_logo.png" />
+              </a>
+              <a class="dib br__50 tc" href="https://in.pinterest.com/thestruttstore/?eq=thestruttstore&etslf=5276" target="_blank">
+                  <img src="../../images/social/pintrst_logo.png" />
+              </a>
+              <a class="dib br__50 tc" href="https://api.whatsapp.com/send?phone=8800400570" target="_blank">
+                  <img src="../../images/social/whatsapp_logo.png" />
+              </a>
+              <a class="dib br__50 tc" href="https://www.youtube.com/channel/UC6W3x4sVRDD0v0-0fIfYOUw" target="_blank">
+                  <img src="../../images/social/Youtube_logo.png" />
+              </a>
+          </div>
+        </div>
+        <div class="jas-col-md-9 jas-col-sm-6 jas-col-xs-12 flex end-lg end-sm center-xs">
+          <marquee   onmouseover="stop()"  onmouseout="start()"><asp:Label ID="lblMarquee1" runat="server" CssClass="text-white"></asp:Label><asp:Label ID="lblMarquee2" runat="server" CssClass="text-orange"></asp:Label></marquee>
+        </div>
+          <div id="divAfterLogin" runat="server" visible="false" class="jas-col-md-12 jas-col-sm-12 jas-col-xs-12 flex end-lg end-sm center-xs" style="color:#fff; font-size:12px;">
+            <asp:Label ID="lblCustName" runat="server"></asp:Label>
+            </div>
+
+        <%--<div class="jas-col-md-4 jas-col-sm-6 jas-col-xs-12 flex end-lg end-sm center-xs">
+          <div class="jas-currency dib pr"><span class="current">USD<i class="fa fa-angle-down ml__5"></i></span>
+            <ul class="pa tr ts__03">
+              <li><a class="currency-item cw chp" href="javascript:void(0);" data-currency="EUR">EUR</a></li>
+              <li><a class="currency-item cw chp" href="javascript:void(0);" data-currency="USD">USD</a></li>
+            </ul>
+          </div>
+        </div>--%>
+
+      </div>
+      <!-- .jas-row --> 
+
+    </div>
+    <!-- .header__top -->
+    
+    <div class="header__mid pl__30 pr__30">
+      <div class="jas-row middle-xs">
+          <div class="hidden-md visible-sm jas-col-sm-3 jas-col-xs-3"> <a href="javascript:void(0);" class="jas-push-menu-btn"> 
+              <img src="../../img/hamburger-black.svg" width="25" height="22" alt="Menu" /> </a> </div>
+        <div class="jas-col-md-2 jas-col-sm-6 jas-col-xs-6 start-md center-sm center-xs">
+          <div class="jas-branding ts__05"><a class="db" href="/">
+              <img class="regular-logo" src="../../assets/images/logo/strutt_newlogo.png" width="200" height="25" alt="Structt" />
+              </a></div>
+        </div>
+        <div class="jas-col-md-8 hidden-sm">
+          <nav class="jas-navigation flex center-xs" role="navigation">
+            <ul id="jas-main-menu" class="jas-menu clearfix">
+                <li class="menu-item menu-item-type-post_type_archive menu-item-object-portfolio menu-item-has-children menu-item-4241"><a href="/category.aspx">Shop</a> </li>
+                <li class="menu-item menu-item-type-post_type_archive menu-item-object-portfolio menu-item-has-children menu-item-4241"><a href="/sales">Sale</a> </li>
+                <li class="menu-item menu-item-type-post_type_archive menu-item-object-portfolio menu-item-has-children menu-item-4241"><a href="/comingsoon.aspx">Corporates</a> </li>
+                <li class="menu-item menu-item-type-post_type_archive menu-item-object-portfolio menu-item-has-children menu-item-4241"><a href="/lookbook">Lookbook</a> </li>
+                <li class="menu-item menu-item-type-post_type_archive menu-item-object-portfolio menu-item-has-children menu-item-4241"><a href="/review.aspx">Blog</a> </li>
+                <li class="menu-item menu-item-type-post_type_archive menu-item-object-portfolio menu-item-has-children menu-item-4241"><a href="/login.aspx">Login / Register</a> </li>
+            </ul>
+          </nav>
+          <!-- .jas-navigation --> 
+        </div>
+        <div class="jas-col-md-2 jas-col-sm-3 jas-col-xs-3">
+          <div class="jas-action flex end-xs middle-xs"> <a class="sf-open cb chp" href="javascript:void(0);" title="Search function only use for product search"><i class="pe-7s-search"></i></a>
+            <div class="jas-my-account hidden-xs ts__05 pr"><a class="cb chp db" href="#"><i class="pe-7s-user"></i></a>
+              <ul class="pa tc">
+                <li>
+                    <a id="aLogin" runat="server" class="db cg chp" href="../login.aspx">Login / Register</a>
+                    <a id="aOrderDetails" runat="server" class="db cg chp" href="account/orderhistory.aspx" visible="false">Order Details</a>
+                </li>
+              </ul>
+            </div>
+            <%--<a class="cb chp hidden-xs" href="#"><i class="pe-7s-like"></i></a>--%>
+              <div class="cb chp hidden-xs">
+                    <asp:LinkButton ID="btnWishlist" runat="server" CssClass="header-cart" PostBackUrl="~/wishlist.aspx" ToolTip="Wishlist">
+                        <i class="icon-heart"></i>
+                        <asp:Label ID="lblWishlist" CssClass="item-counter" runat="server" OnClientClick="ShowPopup()">0</asp:Label>
+                    </asp:LinkButton>
+                </div>
+           
+              <div class="jas-icon-cart1 pr">
+                <a class="cart-contents pr cb chp db" href="/cart.aspx" title="View your shopping cart">
+                    <i class="pe-7s-shopbag"></i><span class="pa count bgb br__50 cw tc"><asp:Literal ID="lblCartCount" Text="0" runat="server"></asp:Literal></span>
+                </a>
+            </div>
+          </div>
+          <!-- .jas-action --> 
+        </div>
+      </div>
+      <!-- .jas-row --> 
+    </div>
+    <!-- .header__mid -->
+   <div class="header__search w__100 dn pf">
+      <div class="pa">
+        <asp:TextBox runat="server" class="search-field" name="q" ID="txtSearch" placeholder="Search Anything..."></asp:TextBox>
+        <asp:LinkButton ID="lbtngo" runat="server" OnClick="lbtngo_Click" CssClass="search-icon"><i class="icon-magnifier"></i></asp:LinkButton>
+      </div>
+      <a id="sf-close" class="pa" href="#"><i class="pe-7s-close"></i></a>
+    </div>
+    <!-- #header__search -->
+    <!-- #header__search -->
+    
+    <div class="jas-canvas-menu jas-push-menu">
+      <h3 class="mg__0 tc cw bgb tu ls__2">Menu <i class="close-menu pe-7s-close pa"></i></h3>
+      <div class="jas-action flex center-xs middle-xs hidden-md hidden-sm visible-xs mt__30"> <a class="sf-open cb chp" href="javascript:void(0);"><i class="pe-7s-search"></i></a>
+        <div class="jas-my-account hidden-xs ts__05 pr"><a class="cb chp db" href="#"><i class="pe-7s-user"></i></a>
+          <ul class="pa tc">
+            <li><
+                <asp:LinkButton ID="btnlogin" runat="server" CssClass="db cg chp" PostBackUrl="~/Login.aspx" ToolTip="Click here to login"> <i class="icon-user" style="font-size:x-large"></i>
+                                </asp:LinkButton>
+            </li>
+          </ul>
+        </div>
+        <a class="cb chp" href="#"><i class="pe-7s-like"></i></a> </div>
+      <!-- .jas-action -->
+      
+    </div>
+    <!-- .jas-canvas-menu -->
+    
+
+      <div class="jas-canvas-menu jas-push-menu">
+      <h3 class="mg__0 tc cw bgb tu ls__2">Menu <i class="close-menu pe-7s-close pa"></i></h3>
+      <%--<div class="jas-action flex center-xs middle-xs hidden-md hidden-sm visible-xs mt__30"> 
+          <a class="sf-open cb chp" href="javascript:void(0);"><i class="pe-7s-search"></i></a>
+        <div class="jas-my-account hidden-xs ts__05 pr">
+            <a class="cb chp db" href="http://janstudio.net/gecko/fashion/my-account/"><i class="pe-7s-user"></i></a>
+          <ul class="pa tc">
+            <li><a class="db cg chp" href="http://janstudio.net/gecko/fashion/my-account/">Login / Register</a></li>
+          </ul>
+        </div>
+        <a class="cb chp" href="http://janstudio.net/gecko/fashion/wishlist/"><i class="pe-7s-like"></i></a> </div>--%>
+      <!-- .jas-action -->
+      <div id="jas-mobile-menu" class="menu-main-menu-container">
+        <ul id="menu-main-menu" class="menu">
+          <li class="menu-item menu-item-type-post_type menu-item-object-page"><a href="/category.aspx"><span>SHOP</span></a></li>
+          <li class="menu-item menu-item-type-post_type menu-item-object-page"><a href="/sales"><span>SALE</span></a></li>
+            <li class="menu-item menu-item-type-post_type menu-item-object-page"><a href="/comingsoon.aspx"><span>Corporates</span></a></li>
+            <li class="menu-item menu-item-type-post_type menu-item-object-page"><a href="/lookbook"><span>Lookbook</span></a></li>
+            <li class="menu-item menu-item-type-post_type menu-item-object-page"><a href="/review.aspx"><span>Blog</span></a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!--start .jas-mini-cart --> 
+
+    <!-- .jas-mini-cart --> 
+  </header>
+
+
+
+        <asp:ContentPlaceHolder ID="cph_main" runat="server">
+        </asp:ContentPlaceHolder>
+        <!--====================  footer area ====================-->
+        <footer id="jas-footer" class="footer-1 pr cw"  role="contentinfo" itemscope="itemscope" itemtype="http://schema.org/WPFooter" >
+  <div class="footer__top pb__80 pt__80">
+    <div class="jas-container pr">
+      <div class="jas-row">
+        <div class="jas-col-md-3 jas-col-sm-6 jas-col-xs-12">
+          <aside id="text-3" class="widget widget_text">
+            <div class="textwidget">
+              <div class="footer-contact">
+                <p>
+                    <a href="/">
+                        <img src="../../../img/logo_white_footer.png" class="mt__5 mb__15 size-full" width="199" height="23" />
+                    </a>
+                    
+                </p>
+                <p><i class="fa fa-briefcase"> </i>C 272, 1st Floor, Sector 10, Noida U.P. - 201301
+                  </p>
+                <p><i class="fa fa-envelope-o"></i> <a href="mailto:connect@thestruttstore.com">connect@thestruttstore.com</a></p>
+                <p><i class="fa fa-phone"></i> 0120 4256583</p>
+                <ul class="jas-social mt__15">
+                  <li><a href="https://www.facebook.com/struttstore/" title="Facebook" target="_blank"> <i class="fa fa-facebook"></i> </a></li>
+                  <li><a href="https://twitter.com/thestruttstore" title="Twitter" target="_blank"> <i class="fa fa-twitter"></i> </a></li>
+                  <li><a href="https://www.instagram.com/thestruttstore/" title="Instagram" target="_blank"> <i class="fa fa-instagram"></i> </a></li>
+                  <li><a href="https://in.pinterest.com/thestruttstore/?eq=thestruttstore&etslf=5276" title="Pinterest" target="_blank"> <i class="fa fa-pinterest-p"></i> </a></li>
+                </ul>
+              </div>
+            </div>
+          </aside>
+        </div>
+        <div class="jas-col-md-3 jas-col-sm-6 jas-col-xs-12">
+          <aside id="nav_menu-3" class="widget widget_nav_menu">
+            <h3 class="widget-title tu">Quick Links</h3>
+            <div class="menu-quick-links-container">
+              <ul id="menu-quick-links" class="menu">
+                <li id="menu-item-4365" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4365"><a href="../../about-us.aspx">About Us</a></li>
+                <li id="menu-item-4369" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4369"><a href="../../contact-us.aspx">Contact Us</a></li>
+                <li id="menu-item-4366" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4366"><a href="../../Login.aspx">My Account</a></li>
+                  <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4366"><a href="../../about-your-product">Get to know your Travel Product</a></li>
+              </ul>
+            </div>
+          </aside>
+        </div>
+        <div class="jas-col-md-3 jas-col-sm-6 jas-col-xs-12">
+          <aside id="nav_menu-2" class="widget widget_nav_menu">
+            <h3 class="widget-title tu">Help &#038; Support</h3>
+            <div class="menu-help-support-container">
+              <ul id="menu-help-support" class="menu">
+                <li id="menu-item-4372" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4372"><a href="../../return-policy.aspx">Returns & Refunds</a></li>
+                <li id="menu-item-4373" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4373"><a href="../../privacy-policy.aspx">Privacy Policy</a></li>
+                <li id="menu-item-4375" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4375"><a href="../../terms-conditions.aspx">Terms &#038; Conditions</a></li>
+                  <li id="menu-item-4375" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4375"><a href="../../sitemap.aspx">Sitemap</a></li>
+              </ul>
+            </div>
+          </aside>
+        </div>
+        <div class="jas-col-md-3 jas-col-sm-6 jas-col-xs-12">
+          <aside id="text-2" class="widget widget_text">
+            <div class="textwidget">
+                <h3 class="widget-title tu">SIGNUP</h3>
+              <script>(function() {
+	window.mc4wp = window.mc4wp || {
+		listeners: [],
+		forms: {
+			on: function(evt, cb) {
+				window.mc4wp.listeners.push(
+					{
+						event   : evt,
+						callback: cb
+					}
+				);
+			}
+		}
+	}
+})();
+</script>
+              <div id="mc4wp-form-1" class="mc4wp-form mc4wp-form-4073">
+                <div class="mc4wp-form-fields">
+                  <div class="signup-newsletter-form dib mb__15" style="height:40px;">
+                    <input type="email" class="input-text" name="EMAIL" placeholder="Your email address" />
+                    <input type="submit" class="submit-btn" value="Sign up" />
+                  </div>
+                </div>
+                <label style="display: none !important;">Leave this field empty if you're human:
+                  <input type="text" name="_mc4wp_honeypot" value="" tabindex="-1" autocomplete="off" />
+                </label>
+                <input type="hidden" name="_mc4wp_timestamp" value="1625049736" />
+                <input type="hidden" name="_mc4wp_form_id" value="4073" />
+                <input type="hidden" name="_mc4wp_form_element_id" value="mc4wp-form-1" />
+                <div class="mc4wp-response"></div>
+              </div>
+              <!-- / Mailchimp for WordPress Plugin -->
+                <h3 class="widget-title tu" style="margin-top:30px;">SECURED BY</h3>
+              <p>
+                  <img src="../../../img/img_mcafee.jpg" width="110px" alt="accept payment" />
+                  <img src="../../../img/img_razorpay.jpg" width="110px" alt="accept payment" />
+              </p>
+                  <p>
+                  <img src="../../../img/img_sectigo.jpg" width="110px" alt="accept payment" />
+                  <img src="../../../img/img_trustedsite.jpg" width="110px" alt="accept payment" />
+              </p>
+            </div>
+          </aside>
+        </div>
+      </div>
+      <!-- .jas-row --> 
+    </div>
+    <!-- .jas-container --> 
+  </div>
+  <!-- .footer__top -->
+  <div class="footer__bot">
+    <div class="jas-container pr tc">
+      <div class="jas-row">
+        
+        <div class="jas-col-md-6 jas-col-sm-12 jas-col-xs-12 start-md center-sm center-xs">
+          <ul id="jas-footer-menu" class="clearfix">
+            <li id="menu-item-4076" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4076"><a href="/">Home</a></li>
+            <li id="menu-item-4077" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4077"><a href="../../category.aspx">Shop</a></li>
+            <li id="menu-item-4078" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4078"><a href="../../about-us.aspx">About Us</a></li>
+            <li id="menu-item-4079" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4079"><a href="../../contact-us.aspx">Contact</a></li>
+            <li id="menu-item-4080" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4080"><a href="../../review.aspx">Blog</a></li>
+          </ul>
+        </div>
+        <div class="jas-col-md-6 jas-col-sm-12 jas-col-xs-12 end-md end-sm center-xs flex"> Copyright © Strutt 2018 All rights reserved </div>
+      </div>
+    </div>
+  </div>
+  <!-- .footer__bot --> 
+</footer>
+        
+        <!--====================  mobile menu overlay ====================-->
+        <div class="mobile-menu-overlay" id="mobile-menu-overlay">
+            <div class="mobile-menu-overlay__inner">
+                <div class="mobile-menu-close-box text-left"><span class="mobile-navigation-close-icon" id="mobile-menu-close-trigger"><i class="icon-cross2"></i></span></div>
+                <div class="mobile-menu-overlay__body">
+                    <nav class="offcanvas-navigation">
+                        <ul>
+                            <li class="has-children"><a href="/">Home</a>
+                            </li>
+                            <li class="has-children"><a href="../../category.aspx"> Category</a>
+                                <ul class="sub-menu">
+                                    <li><a href="/travel-bags">TRAVEL BAGS
+                                        <asp:Repeater ID="rptMenu1" runat="server">
+                                            <ItemTemplate>
+                                                <div class="sub-category">
+                                                    <a href='<%# "../../../"+Eval("menu_url")+"/"+Eval("sub_menu_url") %>' class='<%# Convert.ToBoolean(Eval("is_new"))? "link new ":"link " %>'><%#Eval("sub_menu_name")%></a>
+                                                </div>
+                                            </ItemTemplate>
+                                        </asp:Repeater>
+                                    </a>
+                                    </li>
+                                    <li>
+                                        <a href="/backpacks">Backpacks
+                                        <asp:Repeater ID="rptMenu2" runat="server">
+                                            <ItemTemplate>
+                                                <div class="sub-category">
+                                                    <a href='<%# "../../../"+Eval("menu_url")+"/"+Eval("sub_menu_url") %>' class='<%# Convert.ToBoolean(Eval("is_new"))? "link new ":"link " %>'><%#Eval("sub_menu_name")%></a>
+                                                </div>
+                                            </ItemTemplate>
+                                        </asp:Repeater>
+                                   </li>
+                                    <li><a href="/business-travel">Business Travel
+                                        <asp:Repeater ID="rptMenu5" runat="server">
+                                            <ItemTemplate>
+                                                <div class="sub-category">
+                                                    <a href='<%# "../../../"+Eval("menu_url")+"/"+Eval("sub_menu_url") %>' class='<%# Convert.ToBoolean(Eval("is_new"))? "link new ":"link " %>'><%#Eval("sub_menu_name")%></a>
+                                                </div>
+                                            </ItemTemplate>
+                                        </asp:Repeater>
+                                    </a></li>
+                                    <li><a href="/leisure-travel">Leisure Travel
+                                        <asp:Repeater ID="rptMenu6" runat="server">
+                                        <ItemTemplate>
+                                            <div class="sub-category">
+                                                <a href='<%# "../../../"+Eval("menu_url")+"/"+Eval("sub_menu_url") %>' class='<%# Convert.ToBoolean(Eval("is_new"))? "link new ":"link " %>'><%#Eval("sub_menu_name")%></a>
+                                            </div>
+                                        </ItemTemplate>
+                                    </asp:Repeater>
+                                    </a></li>
+                                    <li><a href="/one-day-travel">One Day Travel<asp:Repeater ID="rptMenu3" runat="server">
+                                        <ItemTemplate>
+                                            <div class="sub-category">
+                                                <a href='<%# "../../../"+Eval("menu_url")+"/"+Eval("sub_menu_url") %>' class='<%# Convert.ToBoolean(Eval("is_new"))? "link new ":"link " %>'><%#Eval("sub_menu_name")%></a>
+                                            </div>
+                                        </ItemTemplate>
+                                    </asp:Repeater>
+                                    </a></li>
+                                    <li><a href="/travel-accessories">Travel Accessories<asp:Repeater ID="rptMenu4" runat="server">
+                                        <ItemTemplate>
+                                            <div class="sub-category">
+                                                <a href='<%# "../../../"+Eval("menu_url")+"/"+Eval("sub_menu_url") %>' class='<%# Convert.ToBoolean(Eval("is_new"))? "link new ":"link " %>'><%#Eval("sub_menu_name")%></a>
+                                            </div>
+                                        </ItemTemplate>
+                                    </asp:Repeater>
+                                    </a></li>
+                                    <li><a href="/travel-essentials">Travel Essentials<asp:Repeater ID="rptMenu7" runat="server">
+                                        <ItemTemplate>
+                                            <div class="sub-category">
+                                                <a href='<%# "../../../"+Eval("menu_url")+"/"+Eval("sub_menu_url") %>' class='<%# Convert.ToBoolean(Eval("is_new"))? "link new ":"link " %>'><%#Eval("sub_menu_name")%></a>
+                                            </div>
+                                        </ItemTemplate>
+                                    </asp:Repeater>
+                                    </a></li>
+                                </ul>
+                                <ul class="sub-menu">
+                                    <li><a href="../sales"><span>Sales</span></a></li>
+                                    <li><a href="../exclusive"><span>Exclusive</span></a></li>
+                                    <li><a href="../bestseller"><span>Best Seller</span></a></li>
+                                </ul>
+                            </li>
+                            <li class="has-children"><a href="../"">Shop</a>
+                                <ul class="sub-menu">
+                                    <li><a href="../sales"><span>Sales</span></a></li>
+                                    <li><a href="../exclusive"><span>Exclusive</span></a></li>
+                                    <li><a href="../bestseller"><span>Best Seller</span></a></li>
+                                </ul>
+                            </li>
+                            <li class="has-children"><a href="#">Info</a>
+                                <ul class="sub-menu">
+                                    <li><a href="../about-us.aspx"><span>About Us</span></a></li>
+                                    <li><a href="../contact-us.aspx"><span>Contact</span></a></li>
+                                    <li><a href="../terms-conditions.aspx"><span>Terms Conditions</span></a></li>
+                                    <li><a href="../return-policy.aspx"><span>exchanges & Returns</span></a></li>
+                                    <li><a href="../sitemap.aspx"><span>Site Map</span></a></li>
+                                </ul>
+                            </li>
+                            <li class="has-children"><asp:HyperLink ID="hlAddBlog" runat="server" NavigateUrl="~/review.aspx">Places- The Blog</asp:HyperLink>
+                            </li>
+                             <li class="has-children"><asp:HyperLink ID="hlLogin" runat="server" NavigateUrl="~/Login.aspx">My Account</asp:HyperLink>
+                        </ul>
+                    </nav>
+                    <div class="mobile-menu-contact-info section-space--mt_60">
+                        <h6>Contact Us</h6>
+                        <p>
+                            C 272, 1st Floor, Sector 10, Noida - 201301, Uttar Pradesh, India.
+                            <br>
+                            connect@thestruttstore.com
+                            <br>
+                            +91- 8800400570
+                        </p>
+                    </div>
+                    <div class="mobile-menu-social-share section-space--mt_60">
+                        <h6>Follow Us</h6>
+                        <ul class="social-share">
+                            <li><a href="https://www.facebook.com/theSTRUTTstore/"><i class="social social_facebook"></i></a></li>
+                            <li><a href="https://www.instagram.com/thestruttstore/"><i class="social social_instagram_square"></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--====================  End of mobile menu overlay  ====================-->
+        <!--  offcanvas Minicart Start -->
+            <div class="jas-mini-cart jas-push-menu">
+      <div class="jas-mini-cart-content">
+        <h3 class="mg__0 tc cw bgb tu ls__2">Mini Cart <i class="close-cart pe-7s-close pa"></i></h3>
+
+
+
+
+          <div class="widget_shopping_cart_content">
+
+	<ul class="woocommerce-mini-cart cart_list product_list_widget ">
+						
+
+     
+        <asp:Repeater ID="rptCartPc" runat="server" OnItemCommand="rptCartPc_ItemCommand">
+                            <ItemTemplate>
+                                <li class="woocommerce-mini-cart-item mini_cart_item">
+                                    <asp:LinkButton ID="btnRemove" class="remove remove_from_cart_button" CommandName="Remove" 
+                                        CommandArgument='<%# Eval("product_id") %>' runat="server">×</asp:LinkButton>									
+                                    <a href="#">
+                                        <img class="img-fluid" width="60" src='<%#Eval("thumb_image") %>' alt='<%# Eval("product_name")%>'>
+                                        <%#Eval("product_name")%>
+                                     </a>
+										                <%--<dl class="variation">
+			                            <dt class="variation-Size">Size:</dt>
+		                            <dd class="variation-Size"><p>S</p>
+                                </dd>
+	                                </dl>--%>
+					                <span class="quantity"><%#Eval("quantity")%> × <span class="woocommerce-Price-amount amount"><bdi>
+                                        <span class="woocommerce-Price-currencySymbol">Rs.</span><%#Eval("sale_price")%></bdi></span></span>				
+						        </li>
+                            </ItemTemplate>
+                        </asp:Repeater>
+
+
+								
+					</ul>
+
+	<p class="woocommerce-mini-cart__total total" style="font-size:14px;">
+		<strong>Subtotal:</strong> <span class="woocommerce-Price-amount amount"><bdi>
+            <span class="woocommerce-Price-currencySymbol">Rs.</span><asp:Literal ID="litSubTotalAmt" runat="server"></asp:Literal></bdi></span>	</p>
+
+              <p class="woocommerce-mini-cart__total total" style="font-size:14px;">
+		<strong>Discount:</strong> <span class="woocommerce-Price-amount amount"><bdi>
+            <span class="woocommerce-Price-currencySymbol">Rs.</span><asp:Literal ID="litTotalDiscount" runat="server"></asp:Literal></bdi></span>	</p>
+
+              <p class="woocommerce-mini-cart__total total">
+		<strong>Total:</strong> <span class="woocommerce-Price-amount amount"><bdi>
+            <span class="woocommerce-Price-currencySymbol">Rs.</span><asp:Literal ID="litTotalAmt" runat="server"></asp:Literal></bdi></span>	</p>
+
+	
+	<p class="woocommerce-mini-cart__buttons buttons">
+        <a href="cart.aspx" class="button wc-forward">View cart</a>
+        <a href="proceedtopayment.aspx" class="button checkout wc-forward">Checkout</a>
+	</p>
+</div>
+
+      </div>
+    </div>
+
+
+        <!--====================  search overlay ====================-->
+        <div class="search-overlay" id="search-overlay">
+            <div class="search-overlay__header">
+                <div class="container">
+                    <div class="row align-items-center">
+                        <div class="col-lg-6 col-8">
+                            <div class="search-title">
+                                <h4 class="font-weight--normal">Search</h4>
+                            </div>
+                        </div>
+                        <div class="col-md-6 ml-auto col-4">
+                            <!-- search content -->
+                            <div class="search-content text-right"><span class="mobile-navigation-close-icon" id="search-close-trigger"><i class="icon-cross"></i></span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="search-overlay__inner">
+                <div class="search-overlay__body">
+                    <div class="search-overlay__form">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-lg-9 ml-auto mr-auto">
+                                    <div>
+                                        <div class="product-cats section-space--mb_60 text-center">
+                                            <label>
+                                                <input type="radio" name="product_cat" value="" checked="checked">
+                                                <span class="line-hover"><a href="/">Home</a></span>
+                                            </label>
+                                            <label>/
+                                                <input type="radio" name="product_cat" value="decoration">
+                                                <span class="line-hover"><a href="/Travel Bags">TRAVEL BAGS
+                                        <asp:Repeater ID="rptMenu1s" runat="server">
+                                            <ItemTemplate>
+                                                <div class="sub-category">
+                                                    <a href='<%# "../../../"+Eval("menu_url")+"/"+Eval("sub_menu_url") %>' class='<%# Convert.ToBoolean(Eval("is_new"))? "link new ":"link " %>'><%#Eval("sub_menu_name")%></a>
+                                                </div>
+                                            </ItemTemplate>
+                                        </asp:Repeater>
+                                    </a></span>
+                                            </label>
+                                            <label>
+                                                <input type="radio" name="product_cat" value="furniture">
+                                                <span class="line-hover"><a href="/travel-essentials">TRAVEL&nbsp;ESSENTIALS
+                                        <br />
+                                        <u>"PROJECT SAFETY"</u>
+                                        <asp:Repeater ID="rptMenu2s" runat="server">
+                                            <ItemTemplate>
+                                                <div class="sub-category">
+                                                    <a href='<%# "../../../"+Eval("menu_url")+"/"+Eval("sub_menu_url") %>' class='<%# Convert.ToBoolean(Eval("is_new"))? "link new ":"link " %>'><%#Eval("sub_menu_name")%></a>
+                                                </div>
+                                            </ItemTemplate>
+                                        </asp:Repeater>
+                                    </a></span>
+                                            </label>
+                                            <label>
+                                                <input type="radio" name="product_cat" value="table">
+                                                <span class="line-hover"><a href="/limited-edition-series">LIMITED EDITION SERIES
+                                        <asp:Repeater ID="rptMenu5s" runat="server">
+                                            <ItemTemplate>
+                                                <div class="sub-category">
+                                                    <a href='<%# "../../../"+Eval("menu_url")+"/"+Eval("sub_menu_url") %>' class='<%# Convert.ToBoolean(Eval("is_new"))? "link new ":"link " %>'><%#Eval("sub_menu_name")%></a>
+                                                </div>
+                                            </ItemTemplate>
+                                        </asp:Repeater>
+                                    </a></span>
+                                            </label>
+                                            <label>
+                                                <input type="radio" name="product_cat" value="chair">
+                                                <span class="line-hover"><a href="/the-voyager-series">THE VOYAGER SERIES<asp:Repeater ID="rptMenu6s" runat="server">
+                                        <ItemTemplate>
+                                            <div class="sub-category">
+                                                <a href='<%# "../../../"+Eval("menu_url")+"/"+Eval("sub_menu_url") %>' class='<%# Convert.ToBoolean(Eval("is_new"))? "link new ":"link " %>'><%#Eval("sub_menu_name")%></a>
+                                            </div>
+                                        </ItemTemplate>
+                                    </asp:Repeater>
+                                    </a></span>
+                                            </label>
+                                            <label>
+                                                <input type="radio" name="product_cat" value="chair">
+                                                <span class="line-hover"><a href="/accessories">ACCESSORIES<asp:Repeater ID="rptMenu3s" runat="server">
+                                        <ItemTemplate>
+                                            <div class="sub-category">
+                                                <a href='<%# "../../../"+Eval("menu_url")+"/"+Eval("sub_menu_url") %>' class='<%# Convert.ToBoolean(Eval("is_new"))? "link new ":"link " %>'><%#Eval("sub_menu_name")%></a>
+                                            </div>
+                                        </ItemTemplate>
+                                    </asp:Repeater>
+                                    </a></span>
+                                            </label>
+                                            <label>
+                                                <input type="radio" name="product_cat" value="chair">
+                                                <span class="line-hover"><a href="/when-we-collaborate">WHEN WE COLLABORATE<asp:Repeater ID="rptMenu4s" runat="server">
+                                        <ItemTemplate>
+                                            <div class="sub-category">
+                                                <a href='<%# "../../../"+Eval("menu_url")+"/"+Eval("sub_menu_url") %>' class='<%# Convert.ToBoolean(Eval("is_new"))? "link new ":"link " %>'><%#Eval("sub_menu_name")%></a>
+                                            </div>
+                                        </ItemTemplate>
+                                    </asp:Repeater>
+                                    </a></span>
+                                            </label>
+                                        </div>
+                                        <div class="search-fields">
+                                            <asp:TextBox runat="server"  name="q" ID="txtname"  AutoPostBack="false" placeholder="Search Anything..."></asp:TextBox>
+                                        <asp:LinkButton ID="lbtngop" runat="server" OnClick="lbtngop_Click" CssClass="submit-button"><i class="icon-magnifier"></i></asp:LinkButton>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--====================  End of search overlay  ====================-->
+
+        <!--====================  scroll top ====================-->
+        <a href="#" class="scroll-top" id="scroll-top"><i class="arrow-top icon-arrow-up"></i><i class="arrow-bottom icon-arrow-up"></i></a>
+        <!--====================  End of scroll top  ====================-->
+            </div>
+
+        <!-- JS
+    ============================================ -->
+        
+        <!-- Bootstrap JS -->
+        <script src="../../assets/js/vendor/bootstrap.min.js" type="text/javascript"></script>
+
+        <!-- Modernizer JS -->
+        <script src="../../assets/js/vendor/modernizr-2.8.3.min.js" type="text/javascript"></script>
+
+        <!-- Fullpage JS -->
+        <script src="../../assets/js/plugins/fullpage.min.js" type="text/javascript"></script>
+        <!-- Slick Slider JS -->
+        <script src="../../assets/js/plugins/slick.min.js" type="text/javascript"></script>
+        <!-- Countdown JS -->
+        <script src="../../assets/js/plugins/countdown.min.js" type="text/javascript"></script>
+        <!-- Magnific Popup JS -->
+        <script src="../../assets/js/plugins/magnific-popup.js" type="text/javascript"></script>
+        <!-- Easyzoom JS -->
+        <script src="../../assets/js/plugins/easyzoom.js" type="text/javascript"></script>
+        <!-- ImagesLoaded JS -->
+        <script src="../../assets/js/plugins/images-loaded.min.js" type="text/javascript"></script>
+        <!-- Isotope JS -->
+        <script src="../../assets/js/plugins/isotope.min.js" type="text/javascript"></script>
+        <!-- YTplayer JS -->
+        <script src="../../assets/js/plugins/YTplayer.js" type="text/javascript"></script>
+
+        <!-- Instagramfeed JS -->
+        <script src="../../assets/js/plugins/jquery.instagramfeed.min.js" type="text/javascript"></script>
+        <!-- Ajax Mail JS -->
+        <script src="../../assets/js/plugins/ajax.mail.js" type="text/javascript"></script>
+        <!-- wow JS -->
+        <script src="../../assets/js/plugins/wow.min.js" type="text/javascript"></script>
+        <!-- Plugins JS (Please remove the comment from below plugins.min.js for better website load performance and remove plugin js files from avobe) -->
+
+        <%--<script src="../assets/js/plugins/plugins.js"></script>--%>
+
+        <!-- Main JS -->
+        <script src="../../assets/js/main.js" type="text/javascript"></script>
+        <!-- BEGIN JIVOSITE CODE {literal} -->
+        <script type='text/javascript' data-cfasync='false'>       window.purechatApi = { l: [], t: [], on: function () { this.l.push(arguments); } }; (function () { var done = false; var script = document.createElement('script'); script.async = true; script.type = 'text/javascript'; script.src = 'https://app.purechat.com/VisitorWidget/WidgetScript'; document.getElementsByTagName('HEAD').item(0).appendChild(script); script.onreadystatechange = script.onload = function (e) { if (!done && (!this.readyState || this.readyState == 'loaded' || this.readyState == 'complete')) { var w = new PCWidget({ c: 'b56ed792-3599-45de-86a1-807b90dd92de', f: true }); done = true; } }; })();</script>
+        <script type="text/javascript" src="https://cdn.ywxi.net/js/1.js" async></script>
+         <%--<script>
+             //Added by chandni
+             function ShowPopupLogin() {
+                 $('#Modellogin').modal('show');
+             }
+    </script>--%>
+
+
+
+<script type='text/javascript' src='../../../js/theme.js' id='jas-gecko-script-js'></script> 
+
+
+    </form>
+    <asp:ContentPlaceHolder ID="cphFooter" runat="server">
+    </asp:ContentPlaceHolder>
+</body>
+</html>

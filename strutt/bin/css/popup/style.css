@@ -1,0 +1,168 @@
+﻿.black_overlay
+{
+    display: none;
+    position: fixed;
+    top: 0%;
+    left: 0%;
+    width: 100%;
+    height: 100%;
+    background-color: black;
+    z-index: 1001;
+    -moz-opacity: 0.8;
+    opacity: .60;
+    filter: alpha(opacity=80);
+}
+.white_content
+{
+    display: none;
+    position: fixed;
+    top: 20%;
+    left: 35%;
+    width: 36%;
+    padding: 0px;
+    border: 0px solid #f8f8fd;
+    background-color: white;
+    z-index: 1002;
+    overflow: auto;
+}
+.headertext
+{
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 18px;
+    color: #646464;
+    font-weight: bold;
+}
+.logtext
+{
+	font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    color: #555555;
+}
+
+.textfield
+{
+    border: 1px solid #fcaddb;
+    width: 220px;
+    height: 25px;
+    font-size:13px;
+}
+.button2
+{
+    background-color: #fd638f;
+    color: White;
+    font-size: 11px;
+    font-weight: bold;
+    border: 0px solid #7f9db9;
+    width: 68px;
+}
+.button2:hover
+{
+	background-color: #75f8e0;
+}
+
+
+.modalBackground {
+	background-color:Black;
+	filter:alpha(opacity=90);
+	opacity:0.6;
+}
+.modalPopup 
+{
+	padding-top:10px;
+	padding-left:10px;
+	width:450px;
+	
+}
+
+.calformat
+{
+	font-size:11px;
+}
+
+@media only screen and (min-width: 601px)
+{
+    .black_overlay
+{
+    display: none;
+    position: fixed;
+    top: 0%;
+    left: 0%;
+    width: 100%;
+    height: 100%;
+    background-color: black;
+    z-index: 1001;
+    -moz-opacity: 0.8;
+    opacity: .60;
+    filter: alpha(opacity=80);
+}
+.white_content
+{
+    display: none;
+    position: fixed;
+    top: 20%;
+    left: 35%;
+    width: 36%;
+    padding: 0px;
+    border: 0px solid #f8f8fd;
+    background-color: white;
+    z-index: 1002;
+    overflow: auto;
+}
+.headertext
+{
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 18px;
+    color: #646464;
+    font-weight: bold;
+}
+.logtext
+{
+	font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    color: #555555;
+}
+
+.textfield
+{
+    border: 1px solid #fcaddb;
+    width: 220px;
+    height: 25px;
+    font-size:13px;
+}
+.button2
+{
+    background-color: #fd638f;
+    color: White;
+    font-size: 11px;
+    font-weight: bold;
+    border: 0px solid #7f9db9;
+    width: 68px;
+}
+.button2:hover
+{
+	background-color: #75f8e0;
+}
+
+
+.modalBackground {
+	background-color:Black;
+	filter:alpha(opacity=90);
+	opacity:0.6;
+}
+.modalPopup 
+{
+	padding-top:10px;
+	padding-left:10px;
+	width:450px;
+	
+}
+
+.modalBackgroundnewsletter {
+    background-color: Black;
+    opacity: 0.87;
+}
+.calformat
+{
+	font-size:11px;
+}
+}
